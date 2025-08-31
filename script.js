@@ -94,8 +94,7 @@ class CrownAndAnchorGame {
                 this.hideLoadingState();
                 this.trackPerformance('gameInitialized');
 
-                // Show welcome notification
-                this.showAdvancedNotification('Welcome to Crown & Anchor! 🎲', 'success', 2000);
+
             }, 500);
         } catch (error) {
             this.handleError('Initialization failed', error);
