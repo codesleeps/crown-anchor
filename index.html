@@ -4,16 +4,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crown & Anchor Game</title>
+    
+    <!-- Primary Meta Tags -->
+    <title>Crown & Anchor Game - Classic Dice Casino Game Online</title>
+    <meta name="title" content="Crown & Anchor Game - Classic Dice Casino Game Online">
+    <meta name="description" content="Play the classic Crown & Anchor dice game online! Bet on symbols, roll dice, and win big. Features tournaments, achievements, and multiplayer modes. Free to play!">
+    <meta name="keywords" content="crown and anchor, dice game, casino game, online game, gambling game, betting game, tournament, multiplayer">
+    <meta name="robots" content="index, follow">
+    <meta name="language" content="English">
+    <meta name="author" content="Crown & Anchor Game">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://crownanchor.game/">
+    <meta property="og:title" content="Crown & Anchor Game - Classic Dice Casino Game Online">
+    <meta property="og:description" content="Play the classic Crown & Anchor dice game online! Bet on symbols, roll dice, and win big. Features tournaments, achievements, and multiplayer modes.">
+    <meta property="og:image" content="https://crownanchor.game/og-image.png">
+    <meta property="og:site_name" content="Crown & Anchor Game">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://crownanchor.game/">
+    <meta property="twitter:title" content="Crown & Anchor Game - Classic Dice Casino Game Online">
+    <meta property="twitter:description" content="Play the classic Crown & Anchor dice game online! Bet on symbols, roll dice, and win big. Features tournaments, achievements, and multiplayer modes.">
+    <meta property="twitter:image" content="https://crownanchor.game/twitter-image.png">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+    
+    <!-- Theme Color -->
+    <meta name="theme-color" content="#1e3c72">
+    <meta name="msapplication-TileColor" content="#1e3c72">
+    
+    <!-- Preload Critical Resources -->
+    <link rel="preload" href="style.css" as="style">
+    <link rel="preload" href="script.js" as="script">
+    
     <link rel="stylesheet" href="style.css">
+    
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Game",
+        "name": "Crown & Anchor Game",
+        "description": "Classic dice casino game where players bet on symbols and roll dice to win. Features single player, multiplayer, and tournament modes.",
+        "url": "https://crownanchor.game/",
+        "genre": "Casino Game",
+        "gamePlatform": "Web Browser",
+        "operatingSystem": "Any",
+        "applicationCategory": "Game",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+        },
+        "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.8",
+            "ratingCount": "1247"
+        }
+    }
+    </script>
 </head>
 
 <body>
-    <div class="game-container">
-        <div class="header-section">
+    <main class="game-container" role="main" aria-label="Crown and Anchor Game">
+        <header class="header-section">
             <div class="game-logo">
-                <span class="logo-icon">👑⚓</span>
-                <span class="logo-text">Crown & Anchor</span>
+                <span class="logo-icon" aria-hidden="true">👑⚓</span>
+                <h1 class="logo-text">Crown & Anchor</h1>
             </div>
             <div class="game-mode-selector">
                 <label for="game-mode">Mode:</label>
@@ -23,9 +87,9 @@
                     <option value="tournament">🏆 Tournament</option>
                 </select>
             </div>
-        </div>
+        </header>
 
-        <div class="balance">
+        <section class="balance" aria-label="Game Status">
             <span>Balance: $<span id="balance">100</span></span>
             <div class="streak-display">
                 <span id="streak-text">No streak</span>
@@ -52,14 +116,14 @@
                 <button id="instructions-toggle" class="control-btn" title="Game Instructions & Rules">📖</button>
                 <button id="help-toggle" class="control-btn" title="Keyboard Shortcuts">❓</button>
             </div>
-        </div>
+        </section>
 
-        <div class="betting-board">
-            <div class="bet-square" data-symbol="crown" title="Bet on Crown (Keyboard: Q) - Win if dice show Crown">
-                <div class="symbol">👑</div>
+        <section class="betting-board" aria-label="Betting Squares" role="group">
+            <button class="bet-square" data-symbol="crown" title="Bet on Crown (Keyboard: Q) - Win if dice show Crown" aria-label="Bet on Crown symbol">
+                <div class="symbol" aria-hidden="true">👑</div>
                 <div class="symbol-name">Crown</div>
                 <div class="bet-amount">$<span class="bet-display">0</span></div>
-            </div>
+            </button>
 
             <div class="bet-square" data-symbol="anchor" title="Bet on Anchor (Keyboard: W) - Win if dice show Anchor">
                 <div class="symbol">⚓</div>

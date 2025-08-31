@@ -4,6 +4,16 @@
     box-sizing: border-box;
 }
 
+html {
+    overflow-x: hidden;
+    width: 100%;
+}
+
+html, body {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
 body {
     font-family: 'Arial', sans-serif;
     background: linear-gradient(135deg, #1e3c72, #2a5298);
@@ -12,6 +22,8 @@ body {
     justify-content: center;
     align-items: center;
     color: white;
+    overflow-x: hidden;
+    width: 100%;
 }
 
 .game-container {
@@ -23,6 +35,8 @@ body {
     max-width: 800px;
     width: 100%;
     position: relative;
+    overflow-x: hidden;
+    box-sizing: border-box;
 }
 
 .header-section {
@@ -365,17 +379,84 @@ button[title]:hover::before,
 }
 
 @media (max-width: 768px) {
+    body {
+        padding: 10px;
+        align-items: flex-start;
+        min-height: auto;
+    }
+
     .game-container {
-        padding: 20px;
-        margin: 10px;
+        padding: 15px;
+        margin: 0;
+        max-width: 100%;
+        width: 100%;
+        min-width: 0;
+        overflow-x: hidden;
+    }
+
+    .header-section {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+
+    .logo-text {
+        font-size: 1.8em;
+    }
+
+    .logo-icon {
+        font-size: 2em;
+    }
+
+    .balance {
+        flex-direction: column;
+        gap: 10px;
+        font-size: 1em;
+        padding: 10px;
+    }
+
+    .control-buttons {
+        gap: 5px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .control-btn {
+        width: 30px;
+        height: 30px;
+        font-size: 1em;
     }
 
     .betting-board {
         grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+    .bet-square {
+        padding: 15px 10px;
+    }
+
+    .symbol {
+        font-size: 2.5em;
+        margin-bottom: 8px;
+    }
+
+    .symbol-name {
+        font-size: 1em;
+        margin-bottom: 8px;
     }
 
     .betting-controls {
         flex-direction: column;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .chip-selector {
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 8px;
     }
 
     .chip {
@@ -384,10 +465,129 @@ button[title]:hover::before,
         font-size: 0.9em;
     }
 
+    .game-controls {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .game-controls button {
+        padding: 12px 18px;
+        font-size: 1em;
+        min-width: 120px;
+    }
+
+    .quick-bets {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .quick-bet-btn {
+        padding: 8px 12px;
+        font-size: 0.85em;
+        min-width: 100px;
+    }
+
+    .dice-container {
+        gap: 15px;
+        margin-bottom: 15px;
+    }
+
     .dice {
         font-size: 3em;
         width: 60px;
         height: 60px;
+    }
+
+    .result-message {
+        font-size: 1.1em;
+        margin-top: 15px;
+        word-wrap: break-word;
+    }
+
+    .history-container {
+        margin-top: 20px;
+        padding: 15px;
+    }
+
+    .theme-selector {
+        font-size: 0.8em;
+    }
+
+    .theme-selector select {
+        font-size: 0.75em;
+        padding: 2px 6px;
+    }
+
+    .game-mode-selector {
+        font-size: 0.8em;
+    }
+
+    .game-mode-selector select {
+        font-size: 0.8em;
+        padding: 4px 8px;
+    }
+
+    /* Hide custom tooltips on mobile, use native ones */
+    button[title]:hover::after,
+    button[title]:hover::before,
+    .bet-square[title]:hover::after,
+    .bet-square[title]:hover::before,
+    .dice[title]:hover::after,
+    .dice[title]:hover::before {
+        display: none;
+    }
+
+    /* Panel adjustments for mobile */
+    .stats-panel,
+    .limits-panel,
+    .help-panel,
+    .achievements-panel,
+    .instructions-panel {
+        width: 95%;
+        max-width: 95%;
+        max-height: 90vh;
+        margin: 5px;
+        padding: 15px;
+    }
+
+    .shortcuts-grid {
+        grid-template-columns: 1fr;
+        gap: 6px;
+    }
+
+    .shortcut-item {
+        font-size: 0.85em;
+    }
+
+    .achievements-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .achievement-item {
+        padding: 12px;
+        gap: 12px;
+    }
+
+    .achievement-icon {
+        font-size: 1.8em;
+        width: 40px;
+    }
+
+    .symbols-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .symbol-info {
+        padding: 12px;
+        gap: 12px;
+    }
+
+    .symbol-large {
+        font-size: 2em;
+        width: 50px;
     }
 }
 
