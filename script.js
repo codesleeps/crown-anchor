@@ -67,6 +67,9 @@ class CrownAndAnchorGame {
         // Error handling
         this.setupErrorHandling();
 
+        // Initialize advanced features
+        this.initAdvancedFeatures();
+
         this.init();
     }
 
@@ -76,7 +79,7 @@ class CrownAndAnchorGame {
 
             // Simulate loading time for better UX
             setTimeout(() => {
-                this.loadGameState();
+                this.loadGameStateCompressed();
                 this.loadStats();
                 this.loadAchievements();
                 this.updateBalance();
@@ -90,6 +93,9 @@ class CrownAndAnchorGame {
 
                 this.hideLoadingState();
                 this.trackPerformance('gameInitialized');
+
+                // Show welcome notification
+                this.showAdvancedNotification('Welcome to Crown & Anchor! 🎲', 'success', 2000);
             }, 500);
         } catch (error) {
             this.handleError('Initialization failed', error);
@@ -124,6 +130,7 @@ class CrownAndAnchorGame {
 
         // UI toggles
         document.getElementById('sound-toggle').addEventListener('click', () => this.toggleSound());
+        document.getElementById('dark-mode-toggle').addEventListener('click', () => this.toggleDarkMode());
         document.getElementById('stats-toggle').addEventListener('click', () => this.toggleStats());
         document.getElementById('limits-toggle').addEventListener('click', () => this.toggleLimits());
         document.getElementById('help-toggle').addEventListener('click', () => this.toggleHelp());
@@ -501,7 +508,7 @@ class CrownAndAnchorGame {
     updateBalance() {
         const balanceElement = document.getElementById('balance');
         if (balanceElement) balanceElement.textContent = this.balance;
-        this.saveGameState();
+        this.saveGameStateCompressed();
 
         if (this.balance <= 0) {
             const totalBets = Object.values(this.bets).reduce((sum, bet) => sum + bet, 0);
@@ -610,6 +617,39 @@ class CrownAndAnchorGame {
                 themeSelect.value = savedTheme;
                 this.setTheme(savedTheme);
             }
+        }
+
+        // Load dark mode preference
+        const savedDarkMode = localStorage.getItem('crownAnchorDarkMode');
+        if (savedDarkMode === 'true') {
+            this.darkMode = true;
+            this.applyDarkMode();
+        }
+    }
+
+    toggleDarkMode() {
+        this.darkMode = !this.darkMode;
+        localStorage.setItem('crownAnchorDarkMode', this.darkMode.toString());
+
+        const darkModeBtn = document.getElementById('dark-mode-toggle');
+        if (darkModeBtn) {
+            darkModeBtn.textContent = this.darkMode ? '☀️' : '🌙';
+        }
+
+        this.applyDarkMode();
+
+        // Track dark mode usage
+        this.trackEvent('dark_mode_toggle', {
+            enabled: this.darkMode,
+            timestamp: new Date().toISOString()
+        });
+    }
+
+    applyDarkMode() {
+        if (this.darkMode) {
+            document.body.classList.add('dark-mode');
+        } else {
+            document.body.classList.remove('dark-mode');
         }
     }
 
@@ -1035,21 +1075,102 @@ class CrownAndAnchorGame {
         window.addEventListener('unhandledrejection', (event) => {
             this.handleError('Unhandled Promise Rejection', event.reason);
         });
+
+        // Network status monitoring
+        window.addEventListener('online', () => {
+            this.showMessage('Connection restored!', 'win');
+            this.isOnline = true;
+            this.syncOfflineData();
+        });
+
+        window.addEventListener('offline', () => {
+            this.showMessage('Playing offline mode', '');
+            this.isOnline = false;
+        });
+
+        // Visibility change handling
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                this.pauseGame();
+            } else {
+                this.resumeGame();
+            }
+        });
     }
 
     handleError(message, error) {
         this.performanceMetrics.errorCount++;
         console.error(`Crown & Anchor Error: ${message}`, error);
 
-        // Show user-friendly error message
+        // Show user-friendly error message with recovery options
         this.showMessage('Something went wrong. The game will continue normally.', 'lose');
 
-        // Track error for analytics (in production, send to error tracking service)
+        // Track error for analytics
         this.trackEvent('error', {
             message: message,
             error: error?.message || 'Unknown error',
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
+            userAgent: navigator.userAgent,
+            url: window.location.href
         });
+
+        // Auto-recovery for common issues
+        if (error?.message?.includes('localStorage')) {
+            this.showMessage('Storage issue detected. Attempting recovery...', '');
+            setTimeout(() => {
+                this.recoverFromStorageError();
+            }, 2000);
+        }
+
+        // Critical error handling
+        if (this.performanceMetrics.errorCount > 5) {
+            this.showMessage('Multiple errors detected. Consider refreshing the page.', 'lose');
+        }
+    }
+
+    recoverFromStorageError() {
+        try {
+            // Clear corrupted data and reinitialize
+            localStorage.removeItem('crownAnchorGame');
+            this.balance = 100;
+            this.bets = { crown: 0, anchor: 0, heart: 0, diamond: 0, club: 0, spade: 0 };
+            this.updateBalance();
+            this.showMessage('Game recovered successfully!', 'win');
+        } catch (e) {
+            this.showMessage('Recovery failed. Please refresh the page.', 'lose');
+        }
+    }
+
+    pauseGame() {
+        this.gamePaused = true;
+        // Pause any ongoing animations or timers
+        if (this.animationFrameId) {
+            cancelAnimationFrame(this.animationFrameId);
+        }
+    }
+
+    resumeGame() {
+        this.gamePaused = false;
+        // Resume animations if needed
+        this.trackEvent('game_resumed', { timestamp: new Date().toISOString() });
+    }
+
+    syncOfflineData() {
+        try {
+            const offlineData = JSON.parse(localStorage.getItem('crownAnchorAnalytics') || '[]');
+            const unsyncedData = offlineData.filter(item => !item.synced);
+
+            if (unsyncedData.length > 0) {
+                // In production, sync with server
+                console.log('Syncing offline data:', unsyncedData.length, 'events');
+
+                // Mark as synced
+                offlineData.forEach(item => item.synced = true);
+                localStorage.setItem('crownAnchorAnalytics', JSON.stringify(offlineData));
+            }
+        } catch (error) {
+            console.warn('Failed to sync offline data:', error);
+        }
     }
 
     trackPerformance(eventName, data = {}) {
@@ -1069,16 +1190,18 @@ class CrownAndAnchorGame {
         // In production, send to analytics service (Google Analytics, etc.)
         console.log('Event Tracked:', eventName, data);
 
-        // Example Google Analytics 4 tracking (uncomment when ready)
-        /*
+        // Google Analytics 4 tracking
         if (typeof gtag !== 'undefined') {
             gtag('event', eventName, {
-                custom_parameter_1: data.value1,
-                custom_parameter_2: data.value2,
-                // Add more parameters as needed
+                game_action: eventName,
+                game_value: data.amount || data.winnings || 0,
+                game_mode: this.gameMode || 'single',
+                balance: this.balance || 0,
+                custom_parameter_1: data.symbol || '',
+                custom_parameter_2: data.results ? data.results.join(',') : '',
+                ...data
             });
         }
-        */
 
         // Store analytics data for offline sync
         this.storeAnalyticsData(eventName, data);
@@ -1118,12 +1241,67 @@ class CrownAndAnchorGame {
                     <div class="spinner"></div>
                     <div class="loading-text">Loading Crown & Anchor...</div>
                     <div class="loading-progress">
-                        <div class="progress-bar"></div>
+                        <div class="progress-bar" id="progress-bar"></div>
+                    </div>
+                    <div class="loading-tips" id="loading-tips">
+                        <p>💡 Tip: Use keyboard shortcuts for faster gameplay!</p>
                     </div>
                 </div>
             `;
             gameContainer.appendChild(loadingOverlay);
+
+            // Animate progress bar
+            this.animateLoadingProgress();
+
+            // Show rotating tips
+            this.showLoadingTips();
         }
+    }
+
+    animateLoadingProgress() {
+        const progressBar = document.getElementById('progress-bar');
+        if (!progressBar) return;
+
+        let progress = 0;
+        const interval = setInterval(() => {
+            progress += Math.random() * 15;
+            if (progress > 90) progress = 90;
+            progressBar.style.width = progress + '%';
+
+            if (progress >= 90) {
+                clearInterval(interval);
+                setTimeout(() => {
+                    progressBar.style.width = '100%';
+                }, 200);
+            }
+        }, 100);
+    }
+
+    showLoadingTips() {
+        const tips = [
+            "💡 Tip: Use keyboard shortcuts for faster gameplay!",
+            "🎯 Tip: Try the 'All Red' quick bet for hearts and diamonds!",
+            "🏆 Tip: Unlock achievements to track your progress!",
+            "🎮 Tip: Switch themes for a different visual experience!",
+            "📊 Tip: Check your statistics to improve your strategy!",
+            "🎲 Tip: Triple matches give the biggest payouts!",
+            "⚡ Tip: Use 'Repeat Bet' to quickly place the same bets!",
+            "🎪 Tip: Tournament mode offers the biggest prizes!"
+        ];
+
+        const tipsElement = document.getElementById('loading-tips');
+        if (!tipsElement) return;
+
+        let currentTip = 0;
+        const tipInterval = setInterval(() => {
+            if (!document.getElementById('loading-overlay')) {
+                clearInterval(tipInterval);
+                return;
+            }
+
+            currentTip = (currentTip + 1) % tips.length;
+            tipsElement.innerHTML = `<p>${tips[currentTip]}</p>`;
+        }, 1500);
     }
 
     hideLoadingState() {
@@ -1189,3 +1367,368 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
     }
 });
+// Advanced UX Features
+initAdvancedFeatures() {
+    this.setupConnectionMonitoring();
+    this.setupPerformanceMonitoring();
+    this.setupAccessibilityFeatures();
+    this.setupAdvancedNotifications();
+}
+
+setupConnectionMonitoring() {
+    // Create connection status indicator
+    const connectionStatus = document.createElement('div');
+    connectionStatus.id = 'connection-status';
+    connectionStatus.className = 'connection-status online';
+    connectionStatus.textContent = '🌐 Online';
+    document.body.appendChild(connectionStatus);
+
+    // Update connection status
+    this.updateConnectionStatus();
+
+    // Monitor connection changes
+    if (navigator.connection) {
+        navigator.connection.addEventListener('change', () => {
+            this.updateConnectionStatus();
+        });
+    }
+}
+
+updateConnectionStatus() {
+    const statusElement = document.getElementById('connection-status');
+    if (!statusElement) return;
+
+    if (navigator.onLine) {
+        statusElement.className = 'connection-status online';
+        statusElement.textContent = '🌐 Online';
+
+        if (navigator.connection) {
+            const connection = navigator.connection;
+            const speed = connection.effectiveType;
+            statusElement.textContent = `🌐 Online (${speed})`;
+        }
+    } else {
+        statusElement.className = 'connection-status offline';
+        statusElement.textContent = '📴 Offline';
+    }
+
+    // Auto-hide after 3 seconds
+    setTimeout(() => {
+        statusElement.style.opacity = '0.3';
+    }, 3000);
+}
+
+setupPerformanceMonitoring() {
+    // Monitor FPS
+    this.fpsCounter = { frames: 0, lastTime: performance.now(), currentFPS: 60 };
+    this.monitorFPS();
+
+    // Monitor memory usage
+    if (performance.memory) {
+        setInterval(() => {
+            this.checkMemoryUsage();
+        }, 30000); // Check every 30 seconds
+    }
+
+    // Monitor page visibility
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+            this.trackEvent('page_hidden', { timestamp: new Date().toISOString() });
+        } else {
+            this.trackEvent('page_visible', { timestamp: new Date().toISOString() });
+        }
+    });
+}
+
+monitorFPS() {
+    const measureFPS = () => {
+        this.fpsCounter.frames++;
+        const currentTime = performance.now();
+        const deltaTime = currentTime - this.fpsCounter.lastTime;
+
+        if (deltaTime >= 1000) {
+            this.fpsCounter.currentFPS = Math.round((this.fpsCounter.frames * 1000) / deltaTime);
+            this.fpsCounter.frames = 0;
+            this.fpsCounter.lastTime = currentTime;
+
+            // Auto-optimize if FPS is consistently low
+            if (this.fpsCounter.currentFPS < 30) {
+                this.enablePerformanceMode();
+            }
+        }
+
+        if (!this.gamePaused) {
+            this.animationFrameId = requestAnimationFrame(measureFPS);
+        }
+    };
+
+    measureFPS();
+}
+
+checkMemoryUsage() {
+    if (!performance.memory) return;
+
+    const memoryUsage = {
+        used: Math.round(performance.memory.usedJSHeapSize / 1024 / 1024),
+        total: Math.round(performance.memory.totalJSHeapSize / 1024 / 1024),
+        limit: Math.round(performance.memory.jsHeapSizeLimit / 1024 / 1024)
+    };
+
+    // Warn if memory usage is high
+    if (memoryUsage.used > 100) {
+        console.warn('High memory usage detected:', memoryUsage);
+        this.trackEvent('high_memory_usage', memoryUsage);
+    }
+
+    // Force garbage collection if available (Chrome DevTools)
+    if (memoryUsage.used > 150 && window.gc) {
+        window.gc();
+    }
+}
+
+enablePerformanceMode() {
+    if (document.body.classList.contains('low-performance')) return;
+
+    document.body.classList.add('low-performance');
+    this.showAdvancedNotification('Performance mode enabled for smoother gameplay', 'info', 3000);
+
+    this.trackEvent('performance_mode_enabled', {
+        fps: this.fpsCounter.currentFPS,
+        timestamp: new Date().toISOString()
+    });
+}
+
+setupAccessibilityFeatures() {
+    // Add screen reader announcements
+    this.createAriaLiveRegion();
+
+    // Enhanced keyboard navigation
+    this.setupAdvancedKeyboardNavigation();
+
+    // High contrast mode detection
+    if (window.matchMedia && window.matchMedia('(prefers-contrast: high)').matches) {
+        document.body.classList.add('high-contrast');
+    }
+
+    // Reduced motion detection
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        document.body.classList.add('reduced-motion');
+    }
+}
+
+createAriaLiveRegion() {
+    const liveRegion = document.createElement('div');
+    liveRegion.id = 'aria-live-region';
+    liveRegion.className = 'sr-only';
+    liveRegion.setAttribute('aria-live', 'polite');
+    liveRegion.setAttribute('aria-atomic', 'true');
+    document.body.appendChild(liveRegion);
+}
+
+announceToScreenReader(message) {
+    const liveRegion = document.getElementById('aria-live-region');
+    if (liveRegion) {
+        liveRegion.textContent = message;
+
+        // Clear after announcement
+        setTimeout(() => {
+            liveRegion.textContent = '';
+        }, 1000);
+    }
+}
+
+setupAdvancedKeyboardNavigation() {
+    // Add focus trap for panels
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            this.closeAllPanels();
+        }
+
+        // Tab navigation improvements
+        if (e.key === 'Tab') {
+            this.handleTabNavigation(e);
+        }
+    });
+}
+
+handleTabNavigation(event) {
+    const focusableElements = document.querySelectorAll(
+        'button:not([disabled]), [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    );
+
+    const firstElement = focusableElements[0];
+    const lastElement = focusableElements[focusableElements.length - 1];
+
+    // Trap focus within open panels
+    const openPanel = document.querySelector('.stats-panel.show, .limits-panel.show, .help-panel.show, .achievements-panel.show, .instructions-panel.show');
+
+    if (openPanel) {
+        const panelFocusable = openPanel.querySelectorAll(
+            'button:not([disabled]), [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+
+        if (panelFocusable.length > 0) {
+            const firstPanelElement = panelFocusable[0];
+            const lastPanelElement = panelFocusable[panelFocusable.length - 1];
+
+            if (event.shiftKey && document.activeElement === firstPanelElement) {
+                event.preventDefault();
+                lastPanelElement.focus();
+            } else if (!event.shiftKey && document.activeElement === lastPanelElement) {
+                event.preventDefault();
+                firstPanelElement.focus();
+            }
+        }
+    }
+}
+
+closeAllPanels() {
+    const panels = ['stats-panel', 'limits-panel', 'help-panel', 'achievements-panel', 'instructions-panel'];
+    panels.forEach(panelId => {
+        const panel = document.getElementById(panelId);
+        if (panel && panel.classList.contains('show')) {
+            panel.classList.remove('show');
+        }
+    });
+}
+
+setupAdvancedNotifications() {
+    // Create notification container
+    const notificationContainer = document.createElement('div');
+    notificationContainer.id = 'notification-container';
+    notificationContainer.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1003;
+            pointer-events: none;
+        `;
+    document.body.appendChild(notificationContainer);
+}
+
+showAdvancedNotification(message, type = 'info', duration = 3000) {
+    const container = document.getElementById('notification-container');
+    if (!container) return;
+
+    const notification = document.createElement('div');
+    notification.className = `advanced-notification ${type} notification-enter`;
+    notification.style.cssText = `
+            background: ${this.getNotificationColor(type)};
+            color: white;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            font-size: 0.9em;
+            font-weight: bold;
+            pointer-events: auto;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            max-width: 300px;
+            word-wrap: break-word;
+        `;
+
+    notification.textContent = message;
+
+    // Click to dismiss
+    notification.addEventListener('click', () => {
+        this.dismissNotification(notification);
+    });
+
+    container.appendChild(notification);
+
+    // Auto-dismiss
+    setTimeout(() => {
+        this.dismissNotification(notification);
+    }, duration);
+
+    // Announce to screen readers
+    this.announceToScreenReader(message);
+}
+
+getNotificationColor(type) {
+    const colors = {
+        info: 'linear-gradient(135deg, #3498db, #2980b9)',
+        success: 'linear-gradient(135deg, #27ae60, #2ecc71)',
+        warning: 'linear-gradient(135deg, #f39c12, #e67e22)',
+        error: 'linear-gradient(135deg, #e74c3c, #c0392b)'
+    };
+    return colors[type] || colors.info;
+}
+
+dismissNotification(notification) {
+    notification.classList.remove('notification-enter');
+    notification.classList.add('notification-exit');
+
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.parentNode.removeChild(notification);
+        }
+    }, 300);
+}
+
+// Enhanced save/load with compression
+saveGameStateCompressed() {
+    try {
+        const gameState = {
+            balance: this.balance,
+            bets: this.bets,
+            limits: this.limits,
+            stats: this.stats,
+            achievements: this.achievements,
+            settings: {
+                soundEnabled: this.soundEnabled,
+                darkMode: this.darkMode,
+                selectedTheme: document.getElementById('theme-select')?.value
+            },
+            timestamp: new Date().toISOString()
+        };
+
+        // Simple compression by removing whitespace
+        const compressed = JSON.stringify(gameState);
+        localStorage.setItem('crownAnchorGameCompressed', compressed);
+
+        this.trackEvent('game_saved', {
+            size: compressed.length,
+            timestamp: gameState.timestamp
+        });
+    } catch (error) {
+        this.handleError('Failed to save game state', error);
+    }
+}
+
+loadGameStateCompressed() {
+    try {
+        const compressed = localStorage.getItem('crownAnchorGameCompressed');
+        if (!compressed) return;
+
+        const gameState = JSON.parse(compressed);
+
+        // Restore game state
+        this.balance = gameState.balance || 100;
+        this.bets = gameState.bets || { crown: 0, anchor: 0, heart: 0, diamond: 0, club: 0, spade: 0 };
+        this.limits = gameState.limits || { minBet: 1, maxBet: 100, tableLimit: 500 };
+        this.stats = gameState.stats || { gamesPlayed: 0, gamesWon: 0, biggestWin: 0, totalWagered: 0, netProfit: 0 };
+        this.achievements = gameState.achievements || this.achievements;
+
+        if (gameState.settings) {
+            this.soundEnabled = gameState.settings.soundEnabled !== false;
+            this.darkMode = gameState.settings.darkMode || false;
+
+            if (gameState.settings.selectedTheme) {
+                const themeSelect = document.getElementById('theme-select');
+                if (themeSelect) {
+                    themeSelect.value = gameState.settings.selectedTheme;
+                    this.setTheme(gameState.settings.selectedTheme);
+                }
+            }
+        }
+
+        this.trackEvent('game_loaded', {
+            timestamp: gameState.timestamp
+        });
+    } catch (error) {
+        this.handleError('Failed to load game state', error);
+    }
+}
+}

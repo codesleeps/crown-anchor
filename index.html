@@ -46,6 +46,22 @@
     
     <link rel="stylesheet" href="style.css">
     
+    <!-- Google Analytics 4 (replace GA_MEASUREMENT_ID with your actual ID) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'GA_MEASUREMENT_ID', {
+            page_title: 'Crown & Anchor Game',
+            page_location: window.location.href,
+            custom_map: {
+                'custom_parameter_1': 'game_action',
+                'custom_parameter_2': 'game_value'
+            }
+        });
+    </script>
+    
     <!-- Structured Data -->
     <script type="application/ld+json">
     {
@@ -110,6 +126,7 @@
             </div>
             <div class="control-buttons">
                 <button id="sound-toggle" class="control-btn" title="Toggle Sound On/Off">🔊</button>
+                <button id="dark-mode-toggle" class="control-btn" title="Toggle Dark/Light Mode">🌙</button>
                 <button id="stats-toggle" class="control-btn" title="View Game Statistics">📊</button>
                 <button id="limits-toggle" class="control-btn" title="Set Betting Limits">⚖️</button>
                 <button id="achievements-toggle" class="control-btn" title="View Achievements">🏆</button>
