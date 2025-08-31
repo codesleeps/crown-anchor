@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crown & Anchor Game</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="game-container">
+        <div class="header-section">
+            <div class="game-logo">
+                <span class="logo-icon">👑⚓</span>
+                <span class="logo-text">Crown & Anchor</span>
+            </div>
+            <div class="game-mode-selector">
+                <label for="game-mode">Mode:</label>
+                <select id="game-mode" title="Choose game mode: Single Player, Multiplayer, or Tournament">
+                    <option value="single">🎮 Single Player</option>
+                    <option value="multiplayer">👥 Multiplayer</option>
+                    <option value="tournament">🏆 Tournament</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="balance">
+            <span>Balance: $<span id="balance">100</span></span>
+            <div class="streak-display">
+                <span id="streak-text">No streak</span>
+                <span id="streak-emoji">🎯</span>
+            </div>
+            <div class="bonus-display" id="bonus-display">
+                <span id="bonus-text">Next bonus in <span id="games-until-bonus">0</span> games</span>
+                <span id="bonus-emoji">🎁</span>
+            </div>
+            <div class="theme-selector">
+                <label for="theme-select">Theme:</label>
+                <select id="theme-select" title="Choose visual theme: Classic, Neon, Royal, or Pirate">
+                    <option value="classic">🎰 Classic</option>
+                    <option value="neon">🌈 Neon</option>
+                    <option value="royal">👑 Royal</option>
+                    <option value="pirate">🏴‍☠️ Pirate</option>
+                </select>
+            </div>
+            <div class="control-buttons">
+                <button id="sound-toggle" class="control-btn" title="Toggle Sound On/Off">🔊</button>
+                <button id="stats-toggle" class="control-btn" title="View Game Statistics">📊</button>
+                <button id="limits-toggle" class="control-btn" title="Set Betting Limits">⚖️</button>
+                <button id="achievements-toggle" class="control-btn" title="View Achievements">🏆</button>
+                <button id="instructions-toggle" class="control-btn" title="Game Instructions & Rules">📖</button>
+                <button id="help-toggle" class="control-btn" title="Keyboard Shortcuts">❓</button>
+            </div>
+        </div>
+
+        <div class="betting-board">
+            <div class="bet-square" data-symbol="crown" title="Bet on Crown (Keyboard: Q) - Win if dice show Crown">
+                <div class="symbol">👑</div>
+                <div class="symbol-name">Crown</div>
+                <div class="bet-amount">$<span class="bet-display">0</span></div>
+            </div>
+
+            <div class="bet-square" data-symbol="anchor" title="Bet on Anchor (Keyboard: W) - Win if dice show Anchor">
+                <div class="symbol">⚓</div>
+                <div class="symbol-name">Anchor</div>
+                <div class="bet-amount">$<span class="bet-display">0</span></div>
+            </div>
+
+            <div class="bet-square" data-symbol="heart" title="Bet on Heart (Keyboard: E) - Win if dice show Heart">
+                <div class="symbol">♥️</div>
+                <div class="symbol-name">Heart</div>
+                <div class="bet-amount">$<span class="bet-display">0</span></div>
+            </div>
+
+            <div class="bet-square" data-symbol="diamond"
+                title="Bet on Diamond (Keyboard: A) - Win if dice show Diamond">
+                <div class="symbol">♦️</div>
+                <div class="symbol-name">Diamond</div>
+                <div class="bet-amount">$<span class="bet-display">0</span></div>
+            </div>
+
+            <div class="bet-square" data-symbol="club" title="Bet on Club (Keyboard: D) - Win if dice show Club">
+                <div class="symbol">♣️</div>
+                <div class="symbol-name">Club</div>
+                <div class="bet-amount">$<span class="bet-display">0</span></div>
+            </div>
+
+            <div class="bet-square" data-symbol="spade" title="Bet on Spade (Keyboard: F) - Win if dice show Spade">
+                <div class="symbol">♠️</div>
+                <div class="symbol-name">Spade</div>
+                <div class="bet-amount">$<span class="bet-display">0</span></div>
+            </div>
+        </div>
+
+        <div class="betting-controls">
+            <div class="chip-selector">
+                <button class="chip" data-value="1" title="Select $1 Chip">$1</button>
+                <button class="chip" data-value="5" title="Select $5 Chip">$5</button>
+                <button class="chip" data-value="10" title="Select $10 Chip">$10</button>
+                <button class="chip" data-value="25" title="Select $25 Chip">$25</button>
+            </div>
+
+            <div class="game-controls">
+                <button id="clear-bets" title="Clear All Bets (Keyboard: C)">Clear Bets</button>
+                <button id="repeat-bet" title="Repeat Last Bet (Keyboard: R)">Repeat Bet</button>
+                <button id="bet-max" title="Bet Maximum on All Squares">Bet Max</button>
+                <button id="roll-dice" title="Roll the Dice (Keyboard: Space)">Roll Dice</button>
+            </div>
+
+            <div class="quick-bets">
+                <button id="bet-all-red" class="quick-bet-btn" title="Bet on Heart and Diamond">All Red (♥️♦️)</button>
+                <button id="bet-all-black" class="quick-bet-btn" title="Bet on Club and Spade">All Black (♣️♠️)</button>
+                <button id="bet-royals" class="quick-bet-btn" title="Bet on Crown and Anchor">Royals (👑⚓)</button>
+            </div>
+        </div>
+
+        <div class="dice-container">
+            <div class="dice" id="dice1" title="Dice 1 - Shows random symbol after roll">🎲</div>
+            <div class="dice" id="dice2" title="Dice 2 - Shows random symbol after roll">🎲</div>
+            <div class="dice" id="dice3" title="Dice 3 - Shows random symbol after roll">🎲</div>
+        </div>
+
+        <div class="result-message" id="result-message"></div>
+
+        <!-- Multiplayer Section -->
+        <div class="multiplayer-section" id="multiplayer-section" style="display: none;">
+            <h3>Multiplayer Lobby</h3>
+            <div class="lobby-controls">
+                <input type="text" id="player-name" placeholder="Enter your name" maxlength="20"
+                    title="Enter your player name for multiplayer">
+                <button id="create-room" title="Create a new multiplayer room">Create Room</button>
+                <button id="join-room" title="Join an existing room with code">Join Room</button>
+                <input type="text" id="room-code" placeholder="Room Code" maxlength="6"
+                    title="Enter 6-character room code">
+            </div>
+            <div class="players-list" id="players-list">
+                <h4>Players in Room:</h4>
+                <div id="players-container">
+                    <div class="player-item">Waiting for players...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tournament Section -->
+        <div class="tournament-section" id="tournament-section" style="display: none;">
+            <h3>Tournament Mode</h3>
+            <div class="tournament-info">
+                <div class="tournament-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">Round:</span>
+                        <span class="stat-value" id="tournament-round">1</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Players Left:</span>
+                        <span class="stat-value" id="players-left">8</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Prize Pool:</span>
+                        <span class="stat-value" id="prize-pool">$1000</span>
+                    </div>
+                </div>
+                <div class="tournament-controls">
+                    <button id="join-tournament" title="Pay $50 to enter 8-player tournament for $1000 prize">Join
+                        Tournament ($50)</button>
+                    <button id="start-tournament" style="display: none;" title="Begin tournament competition">Start
+                        Tournament</button>
+                </div>
+            </div>
+            <div class="tournament-bracket" id="tournament-bracket">
+                <!-- Tournament bracket will be generated here -->
+            </div>
+        </div>
+
+        <!-- Game History -->
+        <div class="history-container">
+            <h4>Recent Rolls</h4>
+            <div class="history-list" id="history-list">
+                <div class="history-placeholder">No rolls yet</div>
+            </div>
+        </div>
+
+
+
+        <!-- Help Panel -->
+        <div class="help-panel" id="help-panel">
+            <div class="panel-header">
+                <h3>Keyboard Shortcuts</h3>
+                <button class="close-btn" id="close-help" title="Close Help Panel">×</button>
+            </div>
+            <div class="shortcuts-grid">
+                <div class="shortcut-item"><kbd>Space</kbd> Roll Dice</div>
+                <div class="shortcut-item"><kbd>1-4</kbd> Select Chips</div>
+                <div class="shortcut-item"><kbd>C</kbd> Clear Bets</div>
+                <div class="shortcut-item"><kbd>R</kbd> Repeat Bet</div>
+                <div class="shortcut-item"><kbd>S</kbd> Toggle Stats</div>
+                <div class="shortcut-item"><kbd>M</kbd> Toggle Sound</div>
+                <div class="shortcut-item"><kbd>L</kbd> Toggle Limits</div>
+                <div class="shortcut-item"><kbd>I</kbd> Instructions</div>
+                <div class="shortcut-item"><kbd>Q</kbd> Bet Crown</div>
+                <div class="shortcut-item"><kbd>W</kbd> Bet Anchor</div>
+                <div class="shortcut-item"><kbd>E</kbd> Bet Heart</div>
+                <div class="shortcut-item"><kbd>A</kbd> Bet Diamond</div>
+                <div class="shortcut-item"><kbd>D</kbd> Bet Club</div>
+                <div class="shortcut-item"><kbd>F</kbd> Bet Spade</div>
+            </div>
+        </div>
+
+        <!-- Betting Limits Panel -->
+        <div class="limits-panel" id="limits-panel">
+            <div class="panel-header">
+                <h3>Betting Limits</h3>
+                <button class="close-btn" id="close-limits">×</button>
+            </div>
+            <div class="limits-grid">
+                <div class="limit-item">
+                    <label for="min-bet">Min Bet per Square:</label>
+                    <select id="min-bet">
+                        <option value="1">$1</option>
+                        <option value="5">$5</option>
+                        <option value="10">$10</option>
+                    </select>
+                </div>
+                <div class="limit-item">
+                    <label for="max-bet">Max Bet per Square:</label>
+                    <select id="max-bet">
+                        <option value="50">$50</option>
+                        <option value="100" selected>$100</option>
+                        <option value="250">$250</option>
+                        <option value="500">$500</option>
+                    </select>
+                </div>
+                <div class="limit-item">
+                    <label for="table-limit">Table Limit (Total):</label>
+                    <select id="table-limit">
+                        <option value="200">$200</option>
+                        <option value="500" selected>$500</option>
+                        <option value="1000">$1000</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics Panel -->
+        <div class="stats-panel" id="stats-panel">
+            <div class="panel-header">
+                <h3>Game Statistics</h3>
+                <button class="close-btn" id="close-stats">×</button>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="stat-label">Games Played:</span>
+                    <span class="stat-value" id="games-played">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Games Won:</span>
+                    <span class="stat-value" id="games-won">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Win Rate:</span>
+                    <span class="stat-value" id="win-rate">0%</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Biggest Win:</span>
+                    <span class="stat-value" id="biggest-win">$0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Total Wagered:</span>
+                    <span class="stat-value" id="total-wagered">$0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Net Profit:</span>
+                    <span class="stat-value" id="net-profit">$0</span>
+                </div>
+            </div>
+            <button id="reset-stats" class="reset-btn" title="Reset all game statistics to zero">Reset Stats</button>
+        </div>
+
+        <!-- Achievements Panel -->
+        <div class="achievements-panel" id="achievements-panel">
+            <div class="panel-header">
+                <h3>Achievements</h3>
+                <button class="close-btn" id="close-achievements">×</button>
+            </div>
+            <div class="achievements-grid" id="achievements-grid">
+                <!-- Achievements will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Instructions Panel -->
+        <div class="instructions-panel" id="instructions-panel">
+            <div class="panel-header">
+                <h3>Game Instructions & Rules</h3>
+                <button class="close-btn" id="close-instructions" title="Close Instructions Panel">×</button>
+            </div>
+            <div class="instructions-content">
+                <div class="instruction-section">
+                    <h4>🎯 How to Play</h4>
+                    <p>Crown & Anchor is a classic dice game where you bet on symbols and win when they appear on the
+                        dice.</p>
+                    <ol>
+                        <li>Select a chip value ($1, $5, $10, or $25)</li>
+                        <li>Click on betting squares to place bets</li>
+                        <li>Roll the dice to see the results</li>
+                        <li>Win money when your symbols appear!</li>
+                    </ol>
+                </div>
+
+                <div class="instruction-section">
+                    <h4>🎲 Symbols & Payouts</h4>
+                    <div class="symbols-grid">
+                        <div class="symbol-info">
+                            <span class="symbol-large">👑</span>
+                            <div>
+                                <strong>Crown</strong>
+                                <p>1:1 payout per die</p>
+                            </div>
+                        </div>
+                        <div class="symbol-info">
+                            <span class="symbol-large">⚓</span>
+                            <div>
+                                <strong>Anchor</strong>
+                                <p>1:1 payout per die</p>
+                            </div>
+                        </div>
+                        <div class="symbol-info">
+                            <span class="symbol-large">♥️</span>
+                            <div>
+                                <strong>Heart</strong>
+                                <p>1:1 payout per die</p>
+                            </div>
+                        </div>
+                        <div class="symbol-info">
+                            <span class="symbol-large">♦️</span>
+                            <div>
+                                <strong>Diamond</strong>
+                                <p>1:1 payout per die</p>
+                            </div>
+                        </div>
+                        <div class="symbol-info">
+                            <span class="symbol-large">♣️</span>
+                            <div>
+                                <strong>Club</strong>
+                                <p>1:1 payout per die</p>
+                            </div>
+                        </div>
+                        <div class="symbol-info">
+                            <span class="symbol-large">♠️</span>
+                            <div>
+                                <strong>Spade</strong>
+                                <p>1:1 payout per die</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="instruction-section">
+                    <h4>💰 Winning Examples</h4>
+                    <ul>
+                        <li><strong>Bet $10 on Crown:</strong> If 2 dice show Crown, win $20</li>
+                        <li><strong>Bet $5 on Heart:</strong> If 1 die shows Heart, win $5</li>
+                        <li><strong>Triple Match:</strong> If all 3 dice show your symbol, win 3x your bet!</li>
+                    </ul>
+                </div>
+
+                <div class="instruction-section">
+                    <h4>🚀 Quick Betting</h4>
+                    <ul>
+                        <li><strong>All Red:</strong> Bets on both Heart and Diamond</li>
+                        <li><strong>All Black:</strong> Bets on both Club and Spade</li>
+                        <li><strong>Royals:</strong> Bets on both Crown and Anchor</li>
+                        <li><strong>Bet Max:</strong> Places maximum bet on all squares</li>
+                    </ul>
+                </div>
+
+                <div class="instruction-section">
+                    <h4>🎮 Game Modes</h4>
+                    <ul>
+                        <li><strong>Single Player:</strong> Play against the house</li>
+                        <li><strong>Multiplayer:</strong> Create or join rooms with friends</li>
+                        <li><strong>Tournament:</strong> Compete in 8-player tournaments for big prizes</li>
+                    </ul>
+                </div>
+
+                <div class="instruction-section">
+                    <h4>🏆 Features</h4>
+                    <ul>
+                        <li><strong>Achievements:</strong> Unlock rewards for milestones</li>
+                        <li><strong>Statistics:</strong> Track your performance</li>
+                        <li><strong>Betting Limits:</strong> Set responsible gambling limits</li>
+                        <li><strong>Themes:</strong> Choose from Classic, Neon, Royal, or Pirate themes</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Audio Elements -->
+    <audio id="chip-sound" preload="auto">
+        <source
+            src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT"
+            type="audio/wav">
+    </audio>
+    <audio id="roll-sound" preload="auto">
+        <source
+            src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT"
+            type="audio/wav">
+    </audio>
+    <audio id="win-sound" preload="auto">
+        <source
+            src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT"
+            type="audio/wav">
+    </audio>
+    <audio id="lose-sound" preload="auto">
+        <source
+            src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT"
+            type="audio/wav">
+    </audio>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
