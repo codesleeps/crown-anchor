@@ -1221,7 +1221,9 @@ class CrownAndAnchorGame {
 
     showLoadingState() {
         this.isLoading = true;
-        const gameContainer = document.querySelector('.game-container');
+        
+        // Try to find game container, fallback to body
+        const gameContainer = document.querySelector('.game-container') || document.body;
 
         if (!document.getElementById('loading-overlay')) {
             const loadingOverlay = document.createElement('div');
@@ -1239,7 +1241,11 @@ class CrownAndAnchorGame {
                     </div>
                 </div>
             `;
-            gameContainer.appendChild(loadingOverlay);
+            
+            // Safely append to container
+            if (gameContainer) {
+                gameContainer.appendChild(loadingOverlay);
+            }
 
             // Animate progress bar
             this.animateLoadingProgress();
@@ -1335,7 +1341,11 @@ class CrownAndAnchorGame {
         connectionStatus.id = 'connection-status';
         connectionStatus.className = 'connection-status online';
         connectionStatus.textContent = '🌐 Online';
-        document.body.appendChild(connectionStatus);
+        
+        // Safely append to body
+        if (document.body) {
+            document.body.appendChild(connectionStatus);
+        }
 
         // Update connection status
         this.updateConnectionStatus();
@@ -1476,7 +1486,11 @@ class CrownAndAnchorGame {
         liveRegion.className = 'sr-only';
         liveRegion.setAttribute('aria-live', 'polite');
         liveRegion.setAttribute('aria-atomic', 'true');
-        document.body.appendChild(liveRegion);
+        
+        // Safely append to body
+        if (document.body) {
+            document.body.appendChild(liveRegion);
+        }
     }
 
     announceToScreenReader(message) {
@@ -1557,7 +1571,11 @@ class CrownAndAnchorGame {
             z-index: 1003;
             pointer-events: none;
         `;
-        document.body.appendChild(notificationContainer);
+        
+        // Safely append to body
+        if (document.body) {
+            document.body.appendChild(notificationContainer);
+        }
     }
 
     showAdvancedNotification(message, type = 'info', duration = 3000) {
