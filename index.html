@@ -155,9 +155,9 @@
                 <div class="symbol-name">Spade</div>
                 <div class="bet-amount">$<span class="bet-display">0</span></div>
             </div>
-        </div>
+        </section>
 
-        <div class="betting-controls">
+        <section class="betting-controls" aria-label="Game Controls">
             <div class="chip-selector">
                 <button class="chip" data-value="1" title="Select $1 Chip">$1</button>
                 <button class="chip" data-value="5" title="Select $5 Chip">$5</button>
@@ -177,15 +177,15 @@
                 <button id="bet-all-black" class="quick-bet-btn" title="Bet on Club and Spade">All Black (♣️♠️)</button>
                 <button id="bet-royals" class="quick-bet-btn" title="Bet on Crown and Anchor">Royals (👑⚓)</button>
             </div>
-        </div>
+        </section>
 
-        <div class="dice-container">
-            <div class="dice" id="dice1" title="Dice 1 - Shows random symbol after roll">🎲</div>
-            <div class="dice" id="dice2" title="Dice 2 - Shows random symbol after roll">🎲</div>
-            <div class="dice" id="dice3" title="Dice 3 - Shows random symbol after roll">🎲</div>
-        </div>
+        <section class="dice-container" aria-label="Game Dice" role="group">
+            <div class="dice" id="dice1" title="Dice 1 - Shows random symbol after roll" role="img" aria-label="Dice 1">🎲</div>
+            <div class="dice" id="dice2" title="Dice 2 - Shows random symbol after roll" role="img" aria-label="Dice 2">🎲</div>
+            <div class="dice" id="dice3" title="Dice 3 - Shows random symbol after roll" role="img" aria-label="Dice 3">🎲</div>
+        </section>
 
-        <div class="result-message" id="result-message"></div>
+        <div class="result-message" id="result-message" role="status" aria-live="polite" aria-label="Game Results"></div>
 
         <!-- Multiplayer Section -->
         <div class="multiplayer-section" id="multiplayer-section" style="display: none;">

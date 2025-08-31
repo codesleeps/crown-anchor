@@ -1,5 +1,13 @@
 class CrownAndAnchorGame {
     constructor() {
+        // Performance monitoring
+        this.performanceMetrics = {
+            gameStartTime: performance.now(),
+            totalGames: 0,
+            averageRollTime: 0,
+            errorCount: 0
+        };
+
         this.balance = 100;
         this.selectedChip = 1;
         this.bets = {
@@ -53,21 +61,39 @@ class CrownAndAnchorGame {
             tournamentWinner: { title: 'Tournament Champion', description: 'Win a tournament', icon: '🏆', unlocked: false }
         };
 
+        // Loading state
+        this.isLoading = false;
+
+        // Error handling
+        this.setupErrorHandling();
+
         this.init();
     }
 
     init() {
-        this.loadGameState();
-        this.loadStats();
-        this.loadAchievements();
-        this.updateBalance();
-        this.setupEventListeners();
-        this.selectChip(1);
-        this.updateStatsDisplay();
-        this.updateHistoryDisplay();
-        this.updateStreakDisplay();
-        this.updateBonusDisplay();
-        this.loadTheme();
+        try {
+            this.showLoadingState();
+
+            // Simulate loading time for better UX
+            setTimeout(() => {
+                this.loadGameState();
+                this.loadStats();
+                this.loadAchievements();
+                this.updateBalance();
+                this.setupEventListeners();
+                this.selectChip(1);
+                this.updateStatsDisplay();
+                this.updateHistoryDisplay();
+                this.updateStreakDisplay();
+                this.updateBonusDisplay();
+                this.loadTheme();
+
+                this.hideLoadingState();
+                this.trackPerformance('gameInitialized');
+            }, 500);
+        } catch (error) {
+            this.handleError('Initialization failed', error);
+        }
     }
 
     setupEventListeners() {
@@ -187,6 +213,14 @@ class CrownAndAnchorGame {
         this.bets[symbol] += this.selectedChip;
         this.balance -= this.selectedChip;
 
+        // Track betting behavior
+        this.trackEvent('bet_placed', {
+            symbol: symbol,
+            amount: this.selectedChip,
+            totalBet: newBet,
+            balance: this.balance
+        });
+
         this.updateBalance();
         this.updateBetDisplay(symbol);
         this.updateSquareSelection(symbol);
@@ -224,6 +258,10 @@ class CrownAndAnchorGame {
     }
 
     rollDice() {
+        if (this.isLoading) return;
+
+        const rollStartTime = performance.now();
+
         const totalBets = Object.values(this.bets).reduce((sum, bet) => sum + bet, 0);
         if (totalBets === 0) {
             this.showMessage('Place a bet first!', 'lose');
@@ -233,22 +271,49 @@ class CrownAndAnchorGame {
         this.lastBets = { ...this.bets };
         this.stats.gamesPlayed++;
         this.stats.totalWagered += totalBets;
+        this.performanceMetrics.totalGames++;
 
         const rollButton = document.getElementById('roll-dice');
         rollButton.disabled = true;
+        rollButton.classList.add('rolling-state');
 
         this.playSound('roll');
 
         const dice = document.querySelectorAll('.dice');
         dice.forEach(die => die.classList.add('rolling'));
 
-        setTimeout(() => {
-            const results = this.generateDiceResults();
-            this.displayDiceResults(results);
-            this.calculateWinnings(results);
+        // Add haptic feedback for mobile
+        if (navigator.vibrate) {
+            navigator.vibrate(100);
+        }
 
-            dice.forEach(die => die.classList.remove('rolling'));
-            rollButton.disabled = false;
+        setTimeout(() => {
+            try {
+                const results = this.generateDiceResults();
+                this.displayDiceResults(results);
+                this.calculateWinnings(results);
+
+                // Track performance
+                const rollTime = performance.now() - rollStartTime;
+                this.performanceMetrics.averageRollTime =
+                    (this.performanceMetrics.averageRollTime * (this.performanceMetrics.totalGames - 1) + rollTime) /
+                    this.performanceMetrics.totalGames;
+
+                this.trackPerformance('diceRoll', {
+                    rollTime: rollTime,
+                    results: results,
+                    totalBets: totalBets
+                });
+
+                dice.forEach(die => die.classList.remove('rolling'));
+                rollButton.disabled = false;
+                rollButton.classList.remove('rolling-state');
+            } catch (error) {
+                this.handleError('Dice roll failed', error);
+                dice.forEach(die => die.classList.remove('rolling'));
+                rollButton.disabled = false;
+                rollButton.classList.remove('rolling-state');
+            }
         }, 1000);
     }
 
@@ -961,6 +1026,117 @@ class CrownAndAnchorGame {
         localStorage.setItem('crownAnchorAchievements', JSON.stringify(this.achievements));
     }
 
+    // Performance & Error Handling Methods
+    setupErrorHandling() {
+        window.addEventListener('error', (event) => {
+            this.handleError('JavaScript Error', event.error);
+        });
+
+        window.addEventListener('unhandledrejection', (event) => {
+            this.handleError('Unhandled Promise Rejection', event.reason);
+        });
+    }
+
+    handleError(message, error) {
+        this.performanceMetrics.errorCount++;
+        console.error(`Crown & Anchor Error: ${message}`, error);
+
+        // Show user-friendly error message
+        this.showMessage('Something went wrong. The game will continue normally.', 'lose');
+
+        // Track error for analytics (in production, send to error tracking service)
+        this.trackEvent('error', {
+            message: message,
+            error: error?.message || 'Unknown error',
+            timestamp: new Date().toISOString()
+        });
+    }
+
+    trackPerformance(eventName, data = {}) {
+        const timestamp = performance.now();
+        const metrics = {
+            event: eventName,
+            timestamp: timestamp,
+            gameTime: timestamp - this.performanceMetrics.gameStartTime,
+            ...data
+        };
+
+        // In production, send to analytics service
+        console.log('Performance Metric:', metrics);
+    }
+
+    trackEvent(eventName, data = {}) {
+        // In production, send to analytics service (Google Analytics, etc.)
+        console.log('Event Tracked:', eventName, data);
+
+        // Example Google Analytics 4 tracking (uncomment when ready)
+        /*
+        if (typeof gtag !== 'undefined') {
+            gtag('event', eventName, {
+                custom_parameter_1: data.value1,
+                custom_parameter_2: data.value2,
+                // Add more parameters as needed
+            });
+        }
+        */
+
+        // Store analytics data for offline sync
+        this.storeAnalyticsData(eventName, data);
+    }
+
+    storeAnalyticsData(eventName, data) {
+        try {
+            const analyticsData = JSON.parse(localStorage.getItem('crownAnchorAnalytics') || '[]');
+            analyticsData.push({
+                event: eventName,
+                data: data,
+                timestamp: new Date().toISOString(),
+                synced: false
+            });
+
+            // Keep only last 100 events to prevent storage bloat
+            if (analyticsData.length > 100) {
+                analyticsData.splice(0, analyticsData.length - 100);
+            }
+
+            localStorage.setItem('crownAnchorAnalytics', JSON.stringify(analyticsData));
+        } catch (error) {
+            console.warn('Failed to store analytics data:', error);
+        }
+    }
+
+    showLoadingState() {
+        this.isLoading = true;
+        const gameContainer = document.querySelector('.game-container');
+
+        if (!document.getElementById('loading-overlay')) {
+            const loadingOverlay = document.createElement('div');
+            loadingOverlay.id = 'loading-overlay';
+            loadingOverlay.className = 'loading-overlay';
+            loadingOverlay.innerHTML = `
+                <div class="loading-spinner">
+                    <div class="spinner"></div>
+                    <div class="loading-text">Loading Crown & Anchor...</div>
+                    <div class="loading-progress">
+                        <div class="progress-bar"></div>
+                    </div>
+                </div>
+            `;
+            gameContainer.appendChild(loadingOverlay);
+        }
+    }
+
+    hideLoadingState() {
+        this.isLoading = false;
+        const loadingOverlay = document.getElementById('loading-overlay');
+        if (loadingOverlay) {
+            loadingOverlay.style.opacity = '0';
+            setTimeout(() => {
+                loadingOverlay.remove();
+            }, 300);
+        }
+    }
+
     loadStats() {
         const savedStats = localStorage.getItem('crownAnchorStats');
         if (savedStats) {
@@ -977,7 +1153,39 @@ class CrownAndAnchorGame {
     }
 }
 
+// Register Service Worker for PWA functionality
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+            .then((registration) => {
+                console.log('Crown & Anchor: Service Worker registered successfully:', registration.scope);
+            })
+            .catch((error) => {
+                console.log('Crown & Anchor: Service Worker registration failed:', error);
+            });
+    });
+}
+
 // Initialize the game when the page loads
 document.addEventListener('DOMContentLoaded', () => {
-    new CrownAndAnchorGame();
+    // Check for browser compatibility
+    if (!window.localStorage) {
+        alert('Your browser does not support local storage. Some features may not work properly.');
+    }
+
+    // Initialize game with error handling
+    try {
+        new CrownAndAnchorGame();
+    } catch (error) {
+        console.error('Failed to initialize Crown & Anchor Game:', error);
+        document.body.innerHTML = `
+            <div style="text-align: center; padding: 50px; color: white; background: #1e3c72;">
+                <h1>🎲 Crown & Anchor Game</h1>
+                <p>Sorry, the game failed to load. Please refresh the page.</p>
+                <button onclick="location.reload()" style="padding: 10px 20px; margin-top: 20px; background: #ffd700; border: none; border-radius: 5px; cursor: pointer;">
+                    Refresh Page
+                </button>
+            </div>
+        `;
+    }
 });

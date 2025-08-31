@@ -1,0 +1,43 @@
+{
+    "name": "Crown & Anchor Game",
+    "short_name": "Crown&Anchor",
+    "description": "Classic dice casino game with tournaments and multiplayer modes",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#1e3c72",
+    "theme_color": "#1e3c72",
+    "orientation": "portrait-primary",
+    "categories": ["games", "entertainment"],
+    "lang": "en",
+    "icons": [
+        {
+            "src": "/android-chrome-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "/android-chrome-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        },
+        {
+            "src": "/apple-touch-icon.png",
+            "sizes": "180x180",
+            "type": "image/png"
+        }
+    ],
+    "screenshots": [
+        {
+            "src": "/screenshot-wide.png",
+            "sizes": "1280x720",
+            "type": "image/png",
+            "form_factor": "wide"
+        },
+        {
+            "src": "/screenshot-narrow.png",
+            "sizes": "640x1136",
+            "type": "image/png",
+            "form_factor": "narrow"
+        }
+    ]
+}
