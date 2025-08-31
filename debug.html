@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crown & Anchor - Debug</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #1e3c72; color: white; }
+        .debug { background: rgba(0,0,0,0.8); padding: 15px; margin: 10px 0; border-radius: 5px; }
+        .error { color: #ff6b6b; }
+        .success { color: #4CAF50; }
+        .warning { color: #ffd700; }
+        button { padding: 10px 15px; margin: 5px; background: #27ae60; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #2ecc71; }
+        .chip { width: 50px; height: 50px; border-radius: 50%; margin: 5px; display: inline-block; text-align: center; line-height: 50px; }
+        .bet-square { width: 100px; height: 100px; margin: 10px; display: inline-block; text-align: center; line-height: 100px; background: #2c3e50; border: 2px solid #ffd700; cursor: pointer; }
+        .bet-square:hover { background: #34495e; }
+    </style>
+</head>
+<body>
+    <h1>🎲 Crown & Anchor - Debug Mode</h1>
+    
+    <div class="debug">
+        <h3>Game Status</h3>
+        <div id="status">Initializing...</div>
+    </div>
+
+    <div class="debug">
+        <h3>Balance</h3>
+        <div>$<span id="balance">100</span></div>
+    </div>
+
+    <div class="debug">
+        <h3>Chips</h3>
+        <button class="chip" data-value="1">$1</button>
+        <button class="chip" data-value="5">$5</button>
+        <button class="chip" data-value="10">$10</button>
+        <button class="chip" data-value="25">$25</button>
+    </div>
+
+    <div class="debug">
+        <h3>Betting Squares</h3>
+        <div class="bet-square" data-symbol="crown">👑<br>Crown<br>$<span class="bet-display">0</span></div>
+        <div class="bet-square" data-symbol="anchor">⚓<br>Anchor<br>$<span class="bet-display">0</span></div>
+        <div class="bet-square" data-symbol="heart">♥️<br>Heart<br>$<span class="bet-display">0</span></div>
+    </div>
+
+    <div class="debug">
+        <h3>Controls</h3>
+        <button id="clear-bets">Clear Bets</button>
+        <button id="roll-dice">Roll Dice</button>
+        <button id="repeat-bet">Repeat Bet</button>
+        <button id="bet-max">Bet Max</button>
+    </div>
+
+    <div class="debug">
+        <h3>Quick Bets</h3>
+        <button id="bet-all-red">All Red</button>
+        <button id="bet-all-black">All Black</button>
+        <button id="bet-royals">Royals</button>
+    </div>
+
+    <div class="debug">
+        <h3>UI Controls</h3>
+        <button id="sound-toggle">🔊</button>
+        <button id="dark-mode-toggle">🌙</button>
+        <button id="stats-toggle">📊</button>
+        <button id="limits-toggle">⚖️</button>
+        <button id="help-toggle">❓</button>
+        <button id="achievements-toggle">🏆</button>
+        <button id="instructions-toggle">📖</button>
+    </div>
+
+    <div class="debug">
+        <h3>Dice</h3>
+        <div class="dice" id="dice1">🎲</div>
+        <div class="dice" id="dice2">🎲</div>
+        <div class="dice" id="dice3">🎲</div>
+    </div>
+
+    <div class="debug">
+        <h3>Messages</h3>
+        <div id="result-message"></div>
+    </div>
+
+    <!-- Hidden panels for testing -->
+    <div id="stats-panel" style="display: none;"></div>
+    <div id="limits-panel" style="display: none;"></div>
+    <div id="help-panel" style="display: none;"></div>
+    <div id="achievements-panel" style="display: none;"></div>
+    <div id="instructions-panel" style="display: none;"></div>
+
+    <!-- Hidden elements for advanced features -->
+    <div id="streak-text">No streak</div>
+    <div id="streak-emoji">🎯</div>
+    <div id="bonus-display">
+        <span id="bonus-text">Next bonus in <span id="games-until-bonus">10</span> games</span>
+        <span id="bonus-emoji">🎁</span>
+    </div>
+    <div id="history-list"></div>
+    <div id="achievements-grid"></div>
+
+    <!-- Theme and game mode selectors -->
+    <select id="theme-select">
+        <option value="classic">Classic</option>
+        <option value="neon">Neon</option>
+    </select>
+    <select id="game-mode">
+        <option value="single">Single Player</option>
+        <option value="multiplayer">Multiplayer</option>
+    </select>
+
+    <script>
+        // Debug logging
+        function log(message, type = 'info') {
+            const status = document.getElementById('status');
+            const className = type === 'error' ? 'error' : type === 'success' ? 'success' : type === 'warning' ? 'warning' : '';
+            status.innerHTML += `<div class="${className}">${new Date().toLocaleTimeString()}: ${message}</div>`;
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+
+        // Override console methods to capture logs
+        const originalError = console.error;
+        console.error = function(...args) {
+            log(`ERROR: ${args.join(' ')}`, 'error');
+            originalError.apply(console, args);
+        };
+
+        const originalWarn = console.warn;
+        console.warn = function(...args) {
+            log(`WARNING: ${args.join(' ')}`, 'warning');
+            originalWarn.apply(console, args);
+        };
+
+        // Test game initialization
+        document.addEventListener('DOMContentLoaded', () => {
+            log('DOM loaded, initializing game...');
+            
+            try {
+                // Load the game script dynamically
+                const script = document.createElement('script');
+                script.src = 'script.js';
+                script.onload = () => {
+                    log('Script loaded successfully', 'success');
+                    
+                    // Test if CrownAndAnchorGame class exists
+                    if (typeof CrownAndAnchorGame !== 'undefined') {
+                        log('CrownAndAnchorGame class found', 'success');
+                        
+                        // Try to create instance
+                        try {
+                            const game = new CrownAndAnchorGame();
+                            log('Game instance created successfully!', 'success');
+                            
+                            // Test basic functionality after a delay
+                            setTimeout(() => {
+                                log('Testing basic functionality...');
+                                
+                                // Test chip selection
+                                const chip = document.querySelector('.chip[data-value="5"]');
+                                if (chip) {
+                                    chip.click();
+                                    log('Chip selection test completed', 'success');
+                                }
+                                
+                                // Test betting
+                                const betSquare = document.querySelector('.bet-square[data-symbol="crown"]');
+                                if (betSquare) {
+                                    betSquare.click();
+                                    log('Betting test completed', 'success');
+                                }
+                                
+                                log('All tests completed!', 'success');
+                            }, 2000);
+                            
+                        } catch (error) {
+                            log(`Failed to create game instance: ${error.message}`, 'error');
+                        }
+                    } else {
+                        log('CrownAndAnchorGame class not found', 'error');
+                    }
+                };
+                
+                script.onerror = () => {
+                    log('Failed to load script.js', 'error');
+                };
+                
+                document.head.appendChild(script);
+                
+            } catch (error) {
+                log(`Initialization error: ${error.message}`, 'error');
+            }
+        });
+    </script>
+</body>
+</html>

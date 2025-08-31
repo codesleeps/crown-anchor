@@ -167,15 +167,15 @@ class CrownAndAnchorGame {
         // Betting limits controls
         document.getElementById('min-bet').addEventListener('change', (e) => {
             this.limits.minBet = parseInt(e.target.value);
-            this.saveGameState();
+            this.saveGameStateCompressed();
         });
         document.getElementById('max-bet').addEventListener('change', (e) => {
             this.limits.maxBet = parseInt(e.target.value);
-            this.saveGameState();
+            this.saveGameStateCompressed();
         });
         document.getElementById('table-limit').addEventListener('change', (e) => {
             this.limits.tableLimit = parseInt(e.target.value);
-            this.saveGameState();
+            this.saveGameStateCompressed();
         });
 
         // Theme selector
@@ -1035,16 +1035,7 @@ class CrownAndAnchorGame {
         }
     }
 
-    saveGameState() {
-        const gameState = {
-            balance: this.balance,
-            soundEnabled: this.soundEnabled,
-            limits: this.limits,
-            currentStreak: this.currentStreak,
-            streakType: this.streakType
-        };
-        localStorage.setItem('crownAnchorGameState', JSON.stringify(gameState));
-    }
+
 
     loadAchievements() {
         const savedAchievements = localStorage.getItem('crownAnchorAchievements');
@@ -1329,6 +1320,371 @@ class CrownAndAnchorGame {
     saveStats() {
         localStorage.setItem('crownAnchorStats', JSON.stringify(this.stats));
     }
+
+    // Advanced UX Features
+    initAdvancedFeatures() {
+        this.setupConnectionMonitoring();
+        this.setupPerformanceMonitoring();
+        this.setupAccessibilityFeatures();
+        this.setupAdvancedNotifications();
+    }
+
+    setupConnectionMonitoring() {
+        // Create connection status indicator
+        const connectionStatus = document.createElement('div');
+        connectionStatus.id = 'connection-status';
+        connectionStatus.className = 'connection-status online';
+        connectionStatus.textContent = '🌐 Online';
+        document.body.appendChild(connectionStatus);
+
+        // Update connection status
+        this.updateConnectionStatus();
+
+        // Monitor connection changes
+        if (navigator.connection) {
+            navigator.connection.addEventListener('change', () => {
+                this.updateConnectionStatus();
+            });
+        }
+    }
+
+    updateConnectionStatus() {
+        const statusElement = document.getElementById('connection-status');
+        if (!statusElement) return;
+
+        if (navigator.onLine) {
+            statusElement.className = 'connection-status online';
+            statusElement.textContent = '🌐 Online';
+
+            if (navigator.connection) {
+                const connection = navigator.connection;
+                const speed = connection.effectiveType;
+                statusElement.textContent = `🌐 Online (${speed})`;
+            }
+        } else {
+            statusElement.className = 'connection-status offline';
+            statusElement.textContent = '📴 Offline';
+        }
+
+        // Auto-hide after 3 seconds
+        setTimeout(() => {
+            statusElement.style.opacity = '0.3';
+        }, 3000);
+    }
+
+    setupPerformanceMonitoring() {
+        // Monitor FPS
+        this.fpsCounter = { frames: 0, lastTime: performance.now(), currentFPS: 60 };
+        this.monitorFPS();
+
+        // Monitor memory usage
+        if (performance.memory) {
+            setInterval(() => {
+                this.checkMemoryUsage();
+            }, 30000); // Check every 30 seconds
+        }
+
+        // Monitor page visibility
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                this.trackEvent('page_hidden', { timestamp: new Date().toISOString() });
+            } else {
+                this.trackEvent('page_visible', { timestamp: new Date().toISOString() });
+            }
+        });
+    }
+
+    monitorFPS() {
+        const measureFPS = () => {
+            this.fpsCounter.frames++;
+            const currentTime = performance.now();
+            const deltaTime = currentTime - this.fpsCounter.lastTime;
+
+            if (deltaTime >= 1000) {
+                this.fpsCounter.currentFPS = Math.round((this.fpsCounter.frames * 1000) / deltaTime);
+                this.fpsCounter.frames = 0;
+                this.fpsCounter.lastTime = currentTime;
+
+                // Auto-optimize if FPS is consistently low
+                if (this.fpsCounter.currentFPS < 30) {
+                    this.enablePerformanceMode();
+                }
+            }
+
+            if (!this.gamePaused) {
+                this.animationFrameId = requestAnimationFrame(measureFPS);
+            }
+        };
+
+        measureFPS();
+    }
+
+    checkMemoryUsage() {
+        if (!performance.memory) return;
+
+        const memoryUsage = {
+            used: Math.round(performance.memory.usedJSHeapSize / 1024 / 1024),
+            total: Math.round(performance.memory.totalJSHeapSize / 1024 / 1024),
+            limit: Math.round(performance.memory.jsHeapSizeLimit / 1024 / 1024)
+        };
+
+        // Warn if memory usage is high
+        if (memoryUsage.used > 100) {
+            console.warn('High memory usage detected:', memoryUsage);
+            this.trackEvent('high_memory_usage', memoryUsage);
+        }
+
+        // Force garbage collection if available (Chrome DevTools)
+        if (memoryUsage.used > 150 && window.gc) {
+            window.gc();
+        }
+    }
+
+    enablePerformanceMode() {
+        if (document.body.classList.contains('low-performance')) return;
+
+        document.body.classList.add('low-performance');
+        this.showAdvancedNotification('Performance mode enabled for smoother gameplay', 'info', 3000);
+
+        this.trackEvent('performance_mode_enabled', {
+            fps: this.fpsCounter.currentFPS,
+            timestamp: new Date().toISOString()
+        });
+    }
+
+    setupAccessibilityFeatures() {
+        // Add screen reader announcements
+        this.createAriaLiveRegion();
+
+        // Enhanced keyboard navigation
+        this.setupAdvancedKeyboardNavigation();
+
+        // High contrast mode detection
+        if (window.matchMedia && window.matchMedia('(prefers-contrast: high)').matches) {
+            document.body.classList.add('high-contrast');
+        }
+
+        // Reduced motion detection
+        if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            document.body.classList.add('reduced-motion');
+        }
+    }
+
+    createAriaLiveRegion() {
+        const liveRegion = document.createElement('div');
+        liveRegion.id = 'aria-live-region';
+        liveRegion.className = 'sr-only';
+        liveRegion.setAttribute('aria-live', 'polite');
+        liveRegion.setAttribute('aria-atomic', 'true');
+        document.body.appendChild(liveRegion);
+    }
+
+    announceToScreenReader(message) {
+        const liveRegion = document.getElementById('aria-live-region');
+        if (liveRegion) {
+            liveRegion.textContent = message;
+
+            // Clear after announcement
+            setTimeout(() => {
+                liveRegion.textContent = '';
+            }, 1000);
+        }
+    }
+
+    setupAdvancedKeyboardNavigation() {
+        // Add focus trap for panels
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                this.closeAllPanels();
+            }
+
+            // Tab navigation improvements
+            if (e.key === 'Tab') {
+                this.handleTabNavigation(e);
+            }
+        });
+    }
+
+    handleTabNavigation(event) {
+        const focusableElements = document.querySelectorAll(
+            'button:not([disabled]), [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+
+        // Trap focus within open panels
+        const openPanel = document.querySelector('.stats-panel.show, .limits-panel.show, .help-panel.show, .achievements-panel.show, .instructions-panel.show');
+
+        if (openPanel) {
+            const panelFocusable = openPanel.querySelectorAll(
+                'button:not([disabled]), [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+            );
+
+            if (panelFocusable.length > 0) {
+                const firstPanelElement = panelFocusable[0];
+                const lastPanelElement = panelFocusable[panelFocusable.length - 1];
+
+                if (event.shiftKey && document.activeElement === firstPanelElement) {
+                    event.preventDefault();
+                    lastPanelElement.focus();
+                } else if (!event.shiftKey && document.activeElement === lastPanelElement) {
+                    event.preventDefault();
+                    firstPanelElement.focus();
+                }
+            }
+        }
+    }
+
+    closeAllPanels() {
+        const panels = ['stats-panel', 'limits-panel', 'help-panel', 'achievements-panel', 'instructions-panel'];
+        panels.forEach(panelId => {
+            const panel = document.getElementById(panelId);
+            if (panel && panel.classList.contains('show')) {
+                panel.classList.remove('show');
+            }
+        });
+    }
+
+    setupAdvancedNotifications() {
+        // Create notification container
+        const notificationContainer = document.createElement('div');
+        notificationContainer.id = 'notification-container';
+        notificationContainer.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1003;
+            pointer-events: none;
+        `;
+        document.body.appendChild(notificationContainer);
+    }
+
+    showAdvancedNotification(message, type = 'info', duration = 3000) {
+        const container = document.getElementById('notification-container');
+        if (!container) return;
+
+        const notification = document.createElement('div');
+        notification.className = `advanced-notification ${type} notification-enter`;
+        notification.style.cssText = `
+            background: ${this.getNotificationColor(type)};
+            color: white;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            font-size: 0.9em;
+            font-weight: bold;
+            pointer-events: auto;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            max-width: 300px;
+            word-wrap: break-word;
+        `;
+
+        notification.textContent = message;
+
+        // Click to dismiss
+        notification.addEventListener('click', () => {
+            this.dismissNotification(notification);
+        });
+
+        container.appendChild(notification);
+
+        // Auto-dismiss
+        setTimeout(() => {
+            this.dismissNotification(notification);
+        }, duration);
+
+        // Announce to screen readers
+        this.announceToScreenReader(message);
+    }
+
+    getNotificationColor(type) {
+        const colors = {
+            info: 'linear-gradient(135deg, #3498db, #2980b9)',
+            success: 'linear-gradient(135deg, #27ae60, #2ecc71)',
+            warning: 'linear-gradient(135deg, #f39c12, #e67e22)',
+            error: 'linear-gradient(135deg, #e74c3c, #c0392b)'
+        };
+        return colors[type] || colors.info;
+    }
+
+    dismissNotification(notification) {
+        notification.classList.remove('notification-enter');
+        notification.classList.add('notification-exit');
+
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 300);
+    }
+
+    // Enhanced save/load with compression
+    saveGameStateCompressed() {
+        try {
+            const gameState = {
+                balance: this.balance,
+                bets: this.bets,
+                limits: this.limits,
+                stats: this.stats,
+                achievements: this.achievements,
+                settings: {
+                    soundEnabled: this.soundEnabled,
+                    darkMode: this.darkMode,
+                    selectedTheme: document.getElementById('theme-select')?.value
+                },
+                timestamp: new Date().toISOString()
+            };
+
+            // Simple compression by removing whitespace
+            const compressed = JSON.stringify(gameState);
+            localStorage.setItem('crownAnchorGameCompressed', compressed);
+
+            this.trackEvent('game_saved', {
+                size: compressed.length,
+                timestamp: gameState.timestamp
+            });
+        } catch (error) {
+            this.handleError('Failed to save game state', error);
+        }
+    }
+
+    loadGameStateCompressed() {
+        try {
+            const compressed = localStorage.getItem('crownAnchorGameCompressed');
+            if (!compressed) return;
+
+            const gameState = JSON.parse(compressed);
+
+            // Restore game state
+            this.balance = gameState.balance || 100;
+            this.bets = gameState.bets || { crown: 0, anchor: 0, heart: 0, diamond: 0, club: 0, spade: 0 };
+            this.limits = gameState.limits || { minBet: 1, maxBet: 100, tableLimit: 500 };
+            this.stats = gameState.stats || { gamesPlayed: 0, gamesWon: 0, biggestWin: 0, totalWagered: 0, netProfit: 0 };
+            this.achievements = gameState.achievements || this.achievements;
+
+            if (gameState.settings) {
+                this.soundEnabled = gameState.settings.soundEnabled !== false;
+                this.darkMode = gameState.settings.darkMode || false;
+
+                if (gameState.settings.selectedTheme) {
+                    const themeSelect = document.getElementById('theme-select');
+                    if (themeSelect) {
+                        themeSelect.value = gameState.settings.selectedTheme;
+                        this.setTheme(gameState.settings.selectedTheme);
+                    }
+                }
+            }
+
+            this.trackEvent('game_loaded', {
+                timestamp: gameState.timestamp
+            });
+        } catch (error) {
+            this.handleError('Failed to load game state', error);
+        }
+    }
 }
 
 // Register Service Worker for PWA functionality
@@ -1367,368 +1723,29 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
     }
 });
-// Advanced UX Features
-initAdvancedFeatures() {
-    this.setupConnectionMonitoring();
-    this.setupPerformanceMonitoring();
-    this.setupAccessibilityFeatures();
-    this.setupAdvancedNotifications();
-}
 
-setupConnectionMonitoring() {
-    // Create connection status indicator
-    const connectionStatus = document.createElement('div');
-    connectionStatus.id = 'connection-status';
-    connectionStatus.className = 'connection-status online';
-    connectionStatus.textContent = '🌐 Online';
-    document.body.appendChild(connectionStatus);
-
-    // Update connection status
-    this.updateConnectionStatus();
-
-    // Monitor connection changes
-    if (navigator.connection) {
-        navigator.connection.addEventListener('change', () => {
-            this.updateConnectionStatus();
-        });
-    }
-}
-
-updateConnectionStatus() {
-    const statusElement = document.getElementById('connection-status');
-    if (!statusElement) return;
-
-    if (navigator.onLine) {
-        statusElement.className = 'connection-status online';
-        statusElement.textContent = '🌐 Online';
-
-        if (navigator.connection) {
-            const connection = navigator.connection;
-            const speed = connection.effectiveType;
-            statusElement.textContent = `🌐 Online (${speed})`;
-        }
-    } else {
-        statusElement.className = 'connection-status offline';
-        statusElement.textContent = '📴 Offline';
+// Initialize the game when the page loads
+document.addEventListener('DOMContentLoaded', () => {
+    // Check for browser compatibility
+    if (!window.localStorage) {
+        alert('Your browser does not support local storage. Some features may not work properly.');
     }
 
-    // Auto-hide after 3 seconds
-    setTimeout(() => {
-        statusElement.style.opacity = '0.3';
-    }, 3000);
-}
-
-setupPerformanceMonitoring() {
-    // Monitor FPS
-    this.fpsCounter = { frames: 0, lastTime: performance.now(), currentFPS: 60 };
-    this.monitorFPS();
-
-    // Monitor memory usage
-    if (performance.memory) {
-        setInterval(() => {
-            this.checkMemoryUsage();
-        }, 30000); // Check every 30 seconds
-    }
-
-    // Monitor page visibility
-    document.addEventListener('visibilitychange', () => {
-        if (document.hidden) {
-            this.trackEvent('page_hidden', { timestamp: new Date().toISOString() });
-        } else {
-            this.trackEvent('page_visible', { timestamp: new Date().toISOString() });
-        }
-    });
-}
-
-monitorFPS() {
-    const measureFPS = () => {
-        this.fpsCounter.frames++;
-        const currentTime = performance.now();
-        const deltaTime = currentTime - this.fpsCounter.lastTime;
-
-        if (deltaTime >= 1000) {
-            this.fpsCounter.currentFPS = Math.round((this.fpsCounter.frames * 1000) / deltaTime);
-            this.fpsCounter.frames = 0;
-            this.fpsCounter.lastTime = currentTime;
-
-            // Auto-optimize if FPS is consistently low
-            if (this.fpsCounter.currentFPS < 30) {
-                this.enablePerformanceMode();
-            }
-        }
-
-        if (!this.gamePaused) {
-            this.animationFrameId = requestAnimationFrame(measureFPS);
-        }
-    };
-
-    measureFPS();
-}
-
-checkMemoryUsage() {
-    if (!performance.memory) return;
-
-    const memoryUsage = {
-        used: Math.round(performance.memory.usedJSHeapSize / 1024 / 1024),
-        total: Math.round(performance.memory.totalJSHeapSize / 1024 / 1024),
-        limit: Math.round(performance.memory.jsHeapSizeLimit / 1024 / 1024)
-    };
-
-    // Warn if memory usage is high
-    if (memoryUsage.used > 100) {
-        console.warn('High memory usage detected:', memoryUsage);
-        this.trackEvent('high_memory_usage', memoryUsage);
-    }
-
-    // Force garbage collection if available (Chrome DevTools)
-    if (memoryUsage.used > 150 && window.gc) {
-        window.gc();
-    }
-}
-
-enablePerformanceMode() {
-    if (document.body.classList.contains('low-performance')) return;
-
-    document.body.classList.add('low-performance');
-    this.showAdvancedNotification('Performance mode enabled for smoother gameplay', 'info', 3000);
-
-    this.trackEvent('performance_mode_enabled', {
-        fps: this.fpsCounter.currentFPS,
-        timestamp: new Date().toISOString()
-    });
-}
-
-setupAccessibilityFeatures() {
-    // Add screen reader announcements
-    this.createAriaLiveRegion();
-
-    // Enhanced keyboard navigation
-    this.setupAdvancedKeyboardNavigation();
-
-    // High contrast mode detection
-    if (window.matchMedia && window.matchMedia('(prefers-contrast: high)').matches) {
-        document.body.classList.add('high-contrast');
-    }
-
-    // Reduced motion detection
-    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        document.body.classList.add('reduced-motion');
-    }
-}
-
-createAriaLiveRegion() {
-    const liveRegion = document.createElement('div');
-    liveRegion.id = 'aria-live-region';
-    liveRegion.className = 'sr-only';
-    liveRegion.setAttribute('aria-live', 'polite');
-    liveRegion.setAttribute('aria-atomic', 'true');
-    document.body.appendChild(liveRegion);
-}
-
-announceToScreenReader(message) {
-    const liveRegion = document.getElementById('aria-live-region');
-    if (liveRegion) {
-        liveRegion.textContent = message;
-
-        // Clear after announcement
-        setTimeout(() => {
-            liveRegion.textContent = '';
-        }, 1000);
-    }
-}
-
-setupAdvancedKeyboardNavigation() {
-    // Add focus trap for panels
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-            this.closeAllPanels();
-        }
-
-        // Tab navigation improvements
-        if (e.key === 'Tab') {
-            this.handleTabNavigation(e);
-        }
-    });
-}
-
-handleTabNavigation(event) {
-    const focusableElements = document.querySelectorAll(
-        'button:not([disabled]), [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-    );
-
-    const firstElement = focusableElements[0];
-    const lastElement = focusableElements[focusableElements.length - 1];
-
-    // Trap focus within open panels
-    const openPanel = document.querySelector('.stats-panel.show, .limits-panel.show, .help-panel.show, .achievements-panel.show, .instructions-panel.show');
-
-    if (openPanel) {
-        const panelFocusable = openPanel.querySelectorAll(
-            'button:not([disabled]), [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-        );
-
-        if (panelFocusable.length > 0) {
-            const firstPanelElement = panelFocusable[0];
-            const lastPanelElement = panelFocusable[panelFocusable.length - 1];
-
-            if (event.shiftKey && document.activeElement === firstPanelElement) {
-                event.preventDefault();
-                lastPanelElement.focus();
-            } else if (!event.shiftKey && document.activeElement === lastPanelElement) {
-                event.preventDefault();
-                firstPanelElement.focus();
-            }
-        }
-    }
-}
-
-closeAllPanels() {
-    const panels = ['stats-panel', 'limits-panel', 'help-panel', 'achievements-panel', 'instructions-panel'];
-    panels.forEach(panelId => {
-        const panel = document.getElementById(panelId);
-        if (panel && panel.classList.contains('show')) {
-            panel.classList.remove('show');
-        }
-    });
-}
-
-setupAdvancedNotifications() {
-    // Create notification container
-    const notificationContainer = document.createElement('div');
-    notificationContainer.id = 'notification-container';
-    notificationContainer.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 1003;
-            pointer-events: none;
-        `;
-    document.body.appendChild(notificationContainer);
-}
-
-showAdvancedNotification(message, type = 'info', duration = 3000) {
-    const container = document.getElementById('notification-container');
-    if (!container) return;
-
-    const notification = document.createElement('div');
-    notification.className = `advanced-notification ${type} notification-enter`;
-    notification.style.cssText = `
-            background: ${this.getNotificationColor(type)};
-            color: white;
-            padding: 12px 16px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-            font-size: 0.9em;
-            font-weight: bold;
-            pointer-events: auto;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            max-width: 300px;
-            word-wrap: break-word;
-        `;
-
-    notification.textContent = message;
-
-    // Click to dismiss
-    notification.addEventListener('click', () => {
-        this.dismissNotification(notification);
-    });
-
-    container.appendChild(notification);
-
-    // Auto-dismiss
-    setTimeout(() => {
-        this.dismissNotification(notification);
-    }, duration);
-
-    // Announce to screen readers
-    this.announceToScreenReader(message);
-}
-
-getNotificationColor(type) {
-    const colors = {
-        info: 'linear-gradient(135deg, #3498db, #2980b9)',
-        success: 'linear-gradient(135deg, #27ae60, #2ecc71)',
-        warning: 'linear-gradient(135deg, #f39c12, #e67e22)',
-        error: 'linear-gradient(135deg, #e74c3c, #c0392b)'
-    };
-    return colors[type] || colors.info;
-}
-
-dismissNotification(notification) {
-    notification.classList.remove('notification-enter');
-    notification.classList.add('notification-exit');
-
-    setTimeout(() => {
-        if (notification.parentNode) {
-            notification.parentNode.removeChild(notification);
-        }
-    }, 300);
-}
-
-// Enhanced save/load with compression
-saveGameStateCompressed() {
+    // Initialize game with error handling
     try {
-        const gameState = {
-            balance: this.balance,
-            bets: this.bets,
-            limits: this.limits,
-            stats: this.stats,
-            achievements: this.achievements,
-            settings: {
-                soundEnabled: this.soundEnabled,
-                darkMode: this.darkMode,
-                selectedTheme: document.getElementById('theme-select')?.value
-            },
-            timestamp: new Date().toISOString()
-        };
-
-        // Simple compression by removing whitespace
-        const compressed = JSON.stringify(gameState);
-        localStorage.setItem('crownAnchorGameCompressed', compressed);
-
-        this.trackEvent('game_saved', {
-            size: compressed.length,
-            timestamp: gameState.timestamp
-        });
+        new CrownAndAnchorGame();
     } catch (error) {
-        this.handleError('Failed to save game state', error);
+        console.error('Failed to initialize Crown & Anchor Game:', error);
+        document.body.innerHTML = `
+            <div style="text-align: center; padding: 50px; color: white; background: #1e3c72;">
+                <h1>🎲 Crown & Anchor Game</h1>
+                <p>Sorry, the game failed to load. Please refresh the page.</p>
+                <button onclick="location.reload()" style="padding: 10px 20px; margin-top: 20px; background: #ffd700; border: none; border-radius: 5px; cursor: pointer;">
+                    Refresh Page
+                </button>
+            </div>
+        `;
     }
-}
+});
 
-loadGameStateCompressed() {
-    try {
-        const compressed = localStorage.getItem('crownAnchorGameCompressed');
-        if (!compressed) return;
 
-        const gameState = JSON.parse(compressed);
-
-        // Restore game state
-        this.balance = gameState.balance || 100;
-        this.bets = gameState.bets || { crown: 0, anchor: 0, heart: 0, diamond: 0, club: 0, spade: 0 };
-        this.limits = gameState.limits || { minBet: 1, maxBet: 100, tableLimit: 500 };
-        this.stats = gameState.stats || { gamesPlayed: 0, gamesWon: 0, biggestWin: 0, totalWagered: 0, netProfit: 0 };
-        this.achievements = gameState.achievements || this.achievements;
-
-        if (gameState.settings) {
-            this.soundEnabled = gameState.settings.soundEnabled !== false;
-            this.darkMode = gameState.settings.darkMode || false;
-
-            if (gameState.settings.selectedTheme) {
-                const themeSelect = document.getElementById('theme-select');
-                if (themeSelect) {
-                    themeSelect.value = gameState.settings.selectedTheme;
-                    this.setTheme(gameState.settings.selectedTheme);
-                }
-            }
-        }
-
-        this.trackEvent('game_loaded', {
-            timestamp: gameState.timestamp
-        });
-    } catch (error) {
-        this.handleError('Failed to load game state', error);
-    }
-}
-}

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crown & Anchor - Test</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div style="position: fixed; top: 10px; left: 10px; background: rgba(0,0,0,0.8); color: white; padding: 10px; border-radius: 5px; z-index: 9999; font-family: monospace; font-size: 12px;">
+        <div>Game Status: <span id="game-status">Loading...</span></div>
+        <div>Errors: <span id="error-count">0</span></div>
+        <div>Balance: $<span id="test-balance">-</span></div>
+    </div>
+
+    <script>
+        // Test script to monitor game initialization
+        let errorCount = 0;
+        let gameInstance = null;
+
+        // Override console.error to track errors
+        const originalError = console.error;
+        console.error = function(...args) {
+            errorCount++;
+            document.getElementById('error-count').textContent = errorCount;
+            originalError.apply(console, args);
+        };
+
+        // Monitor game initialization
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('game-status').textContent = 'Initializing...';
+            
+            setTimeout(() => {
+                try {
+                    // Check if game elements exist
+                    const balance = document.getElementById('balance');
+                    const rollButton = document.getElementById('roll-dice');
+                    const chips = document.querySelectorAll('.chip');
+                    const betSquares = document.querySelectorAll('.bet-square');
+
+                    if (balance && rollButton && chips.length > 0 && betSquares.length > 0) {
+                        document.getElementById('game-status').textContent = 'Ready ✓';
+                        
+                        // Monitor balance changes
+                        const observer = new MutationObserver(() => {
+                            document.getElementById('test-balance').textContent = balance.textContent;
+                        });
+                        observer.observe(balance, { childList: true, subtree: true });
+                        
+                        // Test basic functionality
+                        setTimeout(() => {
+                            if (chips[0]) {
+                                chips[0].click(); // Select first chip
+                                console.log('✓ Chip selection test');
+                            }
+                            
+                            if (betSquares[0]) {
+                                betSquares[0].click(); // Place a bet
+                                console.log('✓ Betting test');
+                            }
+                        }, 1000);
+                        
+                    } else {
+                        document.getElementById('game-status').textContent = 'Missing Elements ✗';
+                        console.error('Missing game elements:', {
+                            balance: !!balance,
+                            rollButton: !!rollButton,
+                            chips: chips.length,
+                            betSquares: betSquares.length
+                        });
+                    }
+                } catch (error) {
+                    document.getElementById('game-status').textContent = 'Error ✗';
+                    console.error('Test error:', error);
+                }
+            }, 2000);
+        });
+    </script>
+
+    <!-- Include the main HTML content -->
+    <script>
+        fetch('index.html')
+            .then(response => response.text())
+            .then(html => {
+                // Extract body content and append to current page
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const gameContainer = doc.querySelector('.game-container');
+                if (gameContainer) {
+                    document.body.appendChild(gameContainer);
+                }
+                
+                // Load the game script
+                const script = document.createElement('script');
+                script.src = 'script.js';
+                document.head.appendChild(script);
+            })
+            .catch(error => {
+                console.error('Failed to load game:', error);
+                document.getElementById('game-status').textContent = 'Load Failed ✗';
+            });
+    </script>
+</body>
+</html>
