@@ -1741,28 +1741,4 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// Initialize the game when the page loads
-document.addEventListener('DOMContentLoaded', () => {
-    // Check for browser compatibility
-    if (!window.localStorage) {
-        alert('Your browser does not support local storage. Some features may not work properly.');
-    }
-
-    // Initialize game with error handling
-    try {
-        new CrownAndAnchorGame();
-    } catch (error) {
-        console.error('Failed to initialize Crown & Anchor Game:', error);
-        document.body.innerHTML = `
-            <div style="text-align: center; padding: 50px; color: white; background: #1e3c72;">
-                <h1>🎲 Crown & Anchor Game</h1>
-                <p>Sorry, the game failed to load. Please refresh the page.</p>
-                <button onclick="location.reload()" style="padding: 10px 20px; margin-top: 20px; background: #ffd700; border: none; border-radius: 5px; cursor: pointer;">
-                    Refresh Page
-                </button>
-            </div>
-        `;
-    }
-});
-
 
