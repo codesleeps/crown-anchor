@@ -129,6 +129,7 @@
                 </select>
             </div>
             <div class="control-buttons">
+                <button id="profile-toggle" class="control-btn" title="View Player Profile">👤</button>
                 <button id="sound-toggle" class="control-btn" title="Toggle Sound On/Off">🔊</button>
                 <button id="dark-mode-toggle" class="control-btn" title="Toggle Dark/Light Mode">🌙</button>
                 <button id="stats-toggle" class="control-btn" title="View Game Statistics">📊</button>
@@ -226,9 +227,15 @@
                     title="Enter 6-character room code">
             </div>
             <div class="players-list" id="players-list">
-                <h4>Players in Room:</h4>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <h4 style="margin: 0;">Players in Room:</h4>
+                    <span id="mp-lobby-code" style="font-weight: bold; color: #3498db; background: rgba(52, 152, 219, 0.1); padding: 3px 8px; border-radius: 5px; display: none;">Room Code: -</span>
+                </div>
                 <div id="players-container">
                     <div class="player-item">Waiting for players...</div>
+                </div>
+                <div style="display: flex; justify-content: center; gap: 10px; margin-top: 15px;">
+                    <button id="mp-ready-btn" class="control-btn" style="display: none; background: #2ecc71; color: white; border: none; padding: 8px 15px; border-radius: 5px; font-weight: bold; cursor: pointer;">Ready</button>
                 </div>
             </div>
         </div>
@@ -254,10 +261,39 @@
                 <div class="tournament-controls">
                     <button id="join-tournament" title="Pay $50 to enter 8-player tournament for $1000 prize">Join
                         Tournament ($50)</button>
-                    <button id="start-tournament" style="display: none;" title="Begin tournament competition">Start
-                        Tournament</button>
+                    <button id="start-tournament" style="display: none;" title="Begin tournament competition">Start Tournament</button>
                 </div>
             </div>
+
+            <div id="tournament-queue-status" style="display: none; text-align: center; margin: 15px 0; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 8px;">
+                <span>Waiting for players: <strong id="tournament-queue-count">0</strong> in lobby</span>
+                <div id="tournament-queue-players" style="font-size: 0.8em; color: #bdc3c7; margin-top: 5px;"></div>
+            </div>
+
+            <div id="tournament-match-arena" style="display: none; margin-top: 20px; padding: 15px; background: rgba(0,0,0,0.2); border-radius: 10px; border: 1px solid #9b59b6;">
+                <h4 style="color: #9b59b6; text-align: center; margin-bottom: 10px;">Match Arena</h4>
+                <div style="display: flex; justify-content: space-around; align-items: center; margin: 10px 0;">
+                    <div style="text-align: center;">
+                        <strong id="match-p1-name" style="font-size: 1.1em; color: #fff;">You</strong>
+                        <div id="match-p1-score" style="font-size: 1.3em; font-weight: bold; color: #2ecc71; margin-top: 5px;">$0</div>
+                        <div id="match-p1-status" style="font-size: 0.8em; color: #bdc3c7; margin-top: 3px;">Not Ready</div>
+                    </div>
+                    <div style="font-size: 1.5em; font-weight: bold; color: #e74c3c;">VS</div>
+                    <div style="text-align: center;">
+                        <strong id="match-p2-name" style="font-size: 1.1em; color: #fff;">Opponent</strong>
+                        <div id="match-p2-score" style="font-size: 1.3em; font-weight: bold; color: #2ecc71; margin-top: 5px;">$0</div>
+                        <div id="match-p2-status" style="font-size: 0.8em; color: #bdc3c7; margin-top: 3px;">Not Ready</div>
+                    </div>
+                </div>
+                <div style="text-align: center; margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px;">
+                    <span id="match-round-text" style="font-weight: bold; color: #f1c40f;">Roll 1 of 3</span>
+                    <div id="opponent-bets-display" style="margin-top: 5px; font-style: italic; font-size: 0.9em; color: #e67e22;">Opponent has not placed bets.</div>
+                </div>
+                <div style="display: flex; justify-content: center; gap: 10px; margin-top: 15px;">
+                    <button id="tournament-lock-bet" style="background: linear-gradient(45deg, #2ecc71, #27ae60); color: white; border: none; padding: 10px 20px; border-radius: 5px; font-weight: bold; cursor: pointer; transition: all 0.3s ease;">Lock Bet & Ready</button>
+                </div>
+            </div>
+
             <div class="tournament-bracket" id="tournament-bracket">
                 <!-- Tournament bracket will be generated here -->
             </div>
@@ -294,6 +330,27 @@
                 <div class="shortcut-item"><kbd>A</kbd> Bet Diamond</div>
                 <div class="shortcut-item"><kbd>D</kbd> Bet Club</div>
                 <div class="shortcut-item"><kbd>F</kbd> Bet Spade</div>
+            </div>
+        </div>
+
+        <!-- Profile Panel -->
+        <div class="profile-panel" id="profile-panel">
+            <div class="panel-header">
+                <h3>Player Profile</h3>
+                <button class="close-btn" id="close-profile">×</button>
+            </div>
+            <div class="profile-content" style="padding: 15px;">
+                <div class="profile-status" id="profile-status-logged-out">
+                    <p style="margin-bottom: 12px; font-size: 0.9em; color: #bdc3c7;">Log in to sync your stats, balance, and achievements with the database.</p>
+                    <div class="login-form" style="display: flex; gap: 10px; flex-direction: column;">
+                        <input type="text" id="profile-username-input" placeholder="Enter username" maxlength="20" style="padding: 8px 12px; border: 2px solid #34495e; border-radius: 5px; background: #2c3e50; color: white;">
+                        <button id="profile-login-btn" style="padding: 8px 15px; background: linear-gradient(45deg, #3498db, #2980b9); border: none; border-radius: 5px; color: white; cursor: pointer; font-weight: bold; transition: all 0.3s ease;">Log In / Register</button>
+                    </div>
+                </div>
+                <div class="profile-status" id="profile-status-logged-in" style="display: none;">
+                    <p style="margin-bottom: 12px; font-size: 1em;">Connected as <strong id="profile-display-name" style="color: #2ecc71;">Guest</strong></p>
+                    <button id="profile-logout-btn" class="reset-btn" style="padding: 8px 15px; background: #e74c3c; border: none; border-radius: 5px; color: white; cursor: pointer; font-weight: bold; transition: all 0.3s ease;">Log Out</button>
+                </div>
             </div>
         </div>
 
@@ -508,6 +565,7 @@
                 type="audio/wav">
         </audio>
 
+        <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
         <script src="script.js"></script>
 </body>
 

@@ -732,6 +732,7 @@ button[title]:hover::before,
     /* Panel adjustments for mobile */
     .stats-panel,
     .limits-panel,
+    .profile-panel,
     .help-panel,
     .achievements-panel,
     .instructions-panel {
@@ -2083,6 +2084,7 @@ button:focus-visible,
     .loading-overlay,
     .stats-panel,
     .limits-panel,
+    .profile-panel,
     .help-panel,
     .achievements-panel,
     .instructions-panel {
@@ -2175,6 +2177,7 @@ Advanced Notification Styles */
 /* Improved Panel Animations */
 .stats-panel.show,
 .limits-panel.show,
+.profile-panel.show,
 .help-panel.show,
 .achievements-panel.show,
 .instructions-panel.show {
@@ -2318,8 +2321,76 @@ body.dark-mode .advanced-notification.error {
 
 .reduced-motion .stats-panel.show,
 .reduced-motion .limits-panel.show,
+.reduced-motion .profile-panel.show,
 .reduced-motion .help-panel.show,
 .reduced-motion .achievements-panel.show,
 .reduced-motion .instructions-panel.show {
     animation: none;
+}
+
+/* Player Profile Panel */
+.profile-panel {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(135deg, #2c3e50, #34495e);
+    border: 3px solid #ffd700;
+    border-radius: 15px;
+    padding: 20px;
+    width: 90%;
+    max-width: 400px;
+    max-height: 80vh;
+    overflow-y: auto;
+    z-index: 1000;
+    display: none;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.profile-panel.show {
+    display: block;
+}
+
+.profile-panel .panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.profile-panel h3 {
+    color: #ffd700;
+    margin: 0;
+    font-size: 1.5em;
+}
+
+/* Other Players' Bets Badges on Squares */
+.bet-square {
+    position: relative;
+}
+
+.other-bets-container {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    pointer-events: none;
+    align-items: flex-end;
+    font-size: 0.7em;
+    max-height: 70px;
+    overflow-y: hidden;
+    z-index: 5;
+}
+
+.other-bet-badge {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+    padding: 2px 5px;
+    border-radius: 3px;
+    font-weight: bold;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    border-left: 3px solid #2ecc71;
+    white-space: nowrap;
 }
