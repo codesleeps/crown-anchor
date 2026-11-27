@@ -49,10 +49,10 @@
     <meta name="msapplication-TileColor" content="#1e3c72">
 
     <!-- Preload Critical Resources -->
-    <link rel="preload" href="style.css?v=20261127b" as="style">
-    <link rel="preload" href="script.js" as="script">
+    <link rel="preload" href="style.css?v=20261127c" as="style">
+    <link rel="preload" href="script.js?v=20261127b" as="script">
 
-    <link rel="stylesheet" href="style.css?v=20261127b">
+    <link rel="stylesheet" href="style.css?v=20261127c">
 
     <!-- Google Analytics 4 (replace GA_MEASUREMENT_ID with your actual ID) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID"></script>
@@ -103,13 +103,15 @@
                 <span class="logo-icon" aria-hidden="true">👑⚓</span>
                 <h1 class="logo-text">Crown & Anchor</h1>
             </div>
-            <div class="game-mode-selector">
-                <label for="game-mode">Mode:</label>
-                <select id="game-mode" title="Choose game mode: Single Player, Multiplayer, or Tournament">
-                    <option value="single">🎮 Single Player</option>
-                    <option value="multiplayer">👥 Multiplayer</option>
-                    <option value="tournament">🏆 Tournament</option>
-                </select>
+            <div class="control-buttons">
+                <button id="profile-toggle" class="control-btn" title="View Player Profile">👤</button>
+                <button id="sound-toggle" class="control-btn" title="Toggle Sound On/Off">🔊</button>
+                <button id="dark-mode-toggle" class="control-btn" title="Toggle Dark/Light Mode">🌙</button>
+                <button id="stats-toggle" class="control-btn" title="View Game Statistics">📊</button>
+                <button id="limits-toggle" class="control-btn" title="Set Betting Limits">⚖️</button>
+                <button id="achievements-toggle" class="control-btn" title="View Achievements">🏆</button>
+                <button id="instructions-toggle" class="control-btn" title="Game Instructions & Rules">📖</button>
+                <button id="help-toggle" class="control-btn" title="Keyboard Shortcuts">❓</button>
             </div>
         </header>
 
@@ -132,17 +134,21 @@
                     <option value="pirate">🏴‍☠️ Pirate</option>
                 </select>
             </div>
-            <div class="control-buttons">
-                <button id="profile-toggle" class="control-btn" title="View Player Profile">👤</button>
-                <button id="sound-toggle" class="control-btn" title="Toggle Sound On/Off">🔊</button>
-                <button id="dark-mode-toggle" class="control-btn" title="Toggle Dark/Light Mode">🌙</button>
-                <button id="stats-toggle" class="control-btn" title="View Game Statistics">📊</button>
-                <button id="limits-toggle" class="control-btn" title="Set Betting Limits">⚖️</button>
-                <button id="achievements-toggle" class="control-btn" title="View Achievements">🏆</button>
-                <button id="instructions-toggle" class="control-btn" title="Game Instructions & Rules">📖</button>
-                <button id="help-toggle" class="control-btn" title="Keyboard Shortcuts">❓</button>
-            </div>
         </section>
+
+        <div class="game-mode-selector" aria-label="Game Mode">
+            <label for="game-mode">Mode:</label>
+            <select id="game-mode" title="Choose game mode: Single Player, Multiplayer, or Tournament">
+                <option value="single">🎮 Single Player</option>
+                <option value="multiplayer">👥 Multiplayer</option>
+                <option value="tournament">🏆 Tournament</option>
+            </select>
+            <div class="mode-pills" role="tablist" aria-label="Game Mode Switch">
+                <button type="button" class="mode-pill active" data-mode="single" onclick="const s=document.getElementById('game-mode');s.value='single';s.dispatchEvent(new Event('change'));this.parentElement.querySelectorAll('.mode-pill').forEach(b=>b.classList.toggle('active',b===this));">Solo</button>
+                <button type="button" class="mode-pill" data-mode="multiplayer" onclick="const s=document.getElementById('game-mode');s.value='multiplayer';s.dispatchEvent(new Event('change'));this.parentElement.querySelectorAll('.mode-pill').forEach(b=>b.classList.toggle('active',b===this));">Multiplayer</button>
+                <button type="button" class="mode-pill" data-mode="tournament" onclick="const s=document.getElementById('game-mode');s.value='tournament';s.dispatchEvent(new Event('change'));this.parentElement.querySelectorAll('.mode-pill').forEach(b=>b.classList.toggle('active',b===this));">Tournament</button>
+            </div>
+        </div>
 
         <section class="betting-board" aria-label="Betting Squares" role="group">
             <button class="bet-square" data-symbol="crown" title="Bet on Crown&#10;Press Q to bet"
@@ -210,13 +216,15 @@
             </div>
         </section>
 
-        <section class="dice-container" aria-label="Game Dice" role="group">
-            <div class="dice" id="dice1" role="img" aria-label="Dice 1">🎲</div>
-            <div class="dice" id="dice2" role="img" aria-label="Dice 2">🎲</div>
-            <div class="dice" id="dice3" role="img" aria-label="Dice 3">🎲</div>
-        </section>
+        <div class="dice-result-row">
+            <section class="dice-container" aria-label="Game Dice" role="group">
+                <div class="dice" id="dice1" role="img" aria-label="Dice 1">🎲</div>
+                <div class="dice" id="dice2" role="img" aria-label="Dice 2">🎲</div>
+                <div class="dice" id="dice3" role="img" aria-label="Dice 3">🎲</div>
+            </section>
 
-        <div class="result-message" id="result-message" role="status" aria-live="polite" aria-label="Game Results">
+            <div class="result-message" id="result-message" role="status" aria-live="polite" aria-label="Game Results">
+            </div>
         </div>
 
         <!-- Multiplayer Section -->
