@@ -2605,12 +2605,12 @@ body.dark-mode .advanced-notification.error {
     }
 
     .dice {
-        width: 52px;
-        height: 52px;
+        width: 64px;
+        height: 64px;
         background: #f8fafc;
         color: #0b0f1a;
         border-radius: 10px;
-        font-size: 1.8em;
+        font-size: 2.4em;
         font-weight: 800;
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
     }
