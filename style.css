@@ -2223,7 +2223,17 @@ body.dark-mode .advanced-notification.error {
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        gap: 12px;
+        align-items: stretch;
+        gap: 10px;
+        overflow-x: hidden;
+    }
+
+    /* Keep toast notifications out of the top bar */
+    #notification-container {
+        top: auto !important;
+        bottom: 12px !important;
+        left: 12px !important;
+        right: 12px !important;
     }
 
     /* Hide custom hover tooltips on mobile */
@@ -2327,9 +2337,9 @@ body.dark-mode .advanced-notification.error {
         background: linear-gradient(135deg, rgba(0, 200, 83, 0.18), rgba(0, 168, 68, 0.08));
         border: 1.5px solid #00c853;
         border-radius: 10px;
-        padding: 7px 14px;
+        padding: 6px 12px;
         font-weight: 700;
-        font-size: 1.05em;
+        font-size: 0.98em;
         line-height: 1.2;
         white-space: nowrap;
     }
@@ -2339,9 +2349,9 @@ body.dark-mode .advanced-notification.error {
         background: #111827;
         border: 1px solid rgba(148, 163, 184, 0.2);
         color: #94a3b8;
-        font-size: 0.75em;
+        font-size: 0.72em;
         border-radius: 8px;
-        padding: 6px 10px;
+        padding: 5px 8px;
         margin: 0;
         display: inline-flex;
         align-items: center;
@@ -2375,6 +2385,7 @@ body.dark-mode .advanced-notification.error {
 
     .mode-pill {
         flex: 1;
+        min-width: 0;
         min-height: 40px;
         border: none;
         border-radius: 8px;
@@ -2384,6 +2395,9 @@ body.dark-mode .advanced-notification.error {
         font-weight: 600;
         cursor: pointer;
         padding: 6px 4px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     .mode-pill.active {
@@ -2400,7 +2414,8 @@ body.dark-mode .advanced-notification.error {
         margin: 0;
     }
 
-    .bet-square {
+    .bet-square,
+    .low-performance .bet-square {
         min-height: 88px;
         padding: 14px 8px;
         border-radius: 14px;
@@ -2420,7 +2435,8 @@ body.dark-mode .advanced-notification.error {
         border-color: rgba(240, 185, 11, 0.4);
     }
 
-    .bet-square.selected {
+    .bet-square.selected,
+    .low-performance .bet-square.selected {
         border-color: #f0b90b;
         box-shadow: 0 0 14px rgba(240, 185, 11, 0.35);
         background: rgba(240, 185, 11, 0.1);
@@ -2464,7 +2480,8 @@ body.dark-mode .advanced-notification.error {
         gap: 12px;
     }
 
-    .chip {
+    .chip,
+    .low-performance .chip {
         width: 48px;
         height: 48px;
         border-radius: 50%;
@@ -2733,9 +2750,14 @@ body.dark-mode .advanced-notification.error {
         display: none;
     }
 
-    .bet-square {
-        min-height: 68px;
+    .bet-square,
+    .low-performance .bet-square {
+        min-height: 66px;
         padding: 8px 4px;
+    }
+
+    .betting-controls {
+        gap: 8px;
     }
 
     .dice {
