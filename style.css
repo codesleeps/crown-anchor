@@ -2441,20 +2441,231 @@ body.dark-mode .advanced-notification.error {
 .dice { width: 62px; height: 62px; font-size: 2.8em; }
 .history-list { max-height: 150px; }
 
-/* Single-column fallback on narrow screens */
+/* ============================================================
+   MOBILE-FIRST: Single screen, ZERO vertical scroll
+   iPhone ~375×667 usable viewport target
+   ============================================================ */
 @media (max-width: 900px) {
-    .game-container {
-        grid-template-columns: 1fr;
-        grid-template-areas:
-            "header"
-            "balance"
-            "board"
-            "controls"
-            "dice"
-            "result"
-            "history";
+    /* Lock viewport: no scroll */
+    html, body {
+        height: 100dvh;
+        height: 100vh;
+        overflow: hidden;
+        position: fixed;
+        width: 100%;
+        top: 0;
+        left: 0;
+        margin: 0;
+        padding: 0;
     }
-    .betting-controls { flex-direction: row; align-items: center; justify-content: center; }
+
+    body {
+        display: block;
+        padding: 0;
+        align-items: stretch;
+        min-height: auto;
+    }
+
+    .game-container {
+        display: flex;
+        flex-direction: column;
+        height: 100dvh;
+        height: 100vh;
+        max-width: 100%;
+        width: 100%;
+        padding: 6px 8px;
+        border-radius: 0;
+        gap: 4px;
+        overflow: hidden;
+        margin: 0;
+        background: rgba(0, 0, 0, 0.85);
+    }
+
+    /* ---- HEADER: ultra-compact ---- */
+    .header-section {
+        flex: 0 0 auto;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0;
+        gap: 4px;
+        padding: 2px 0;
+    }
+
+    .game-logo { gap: 4px; }
+    .logo-icon { font-size: 1.3em; }
+    .logo-text { font-size: 1.1em; display: inline; }
+    .game-mode-selector { font-size: 0.65em; gap: 2px; }
+    .game-mode-selector select { font-size: 0.65em; padding: 2px 4px; }
+
+    /* ---- BALANCE BAR: single line ---- */
+    .balance {
+        flex: 0 0 auto;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: nowrap;
+        gap: 0;
+        font-size: 0.75em;
+        margin-bottom: 0;
+        padding: 4px 8px;
+        border-radius: 6px;
+    }
+    .balance > span:first-child { font-size: 0.85em; }
+    .streak-display { font-size: 0.7em; padding: 2px 6px; gap: 2px; }
+    .bonus-display { font-size: 0.7em; padding: 2px 6px; gap: 2px; }
+    .theme-selector { display: none; }
+    .control-buttons { gap: 3px; }
+    .control-btn {
+        width: 24px;
+        height: 24px;
+        font-size: 0.8em;
+        border-width: 1px;
+    }
+
+    /* ---- BETTING BOARD: 2×3 compact grid ---- */
+    .betting-board {
+        flex: 0 0 auto;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 4px;
+        margin-bottom: 0;
+    }
+    .bet-square {
+        padding: 6px 3px;
+        border-radius: 8px;
+        border-width: 2px;
+    }
+    .bet-square .symbol {
+        font-size: 1.6em;
+        margin-bottom: 1px;
+    }
+    .bet-square .symbol-name {
+        font-size: 0.65em;
+        margin-bottom: 2px;
+    }
+    .bet-square .bet-amount {
+        font-size: 0.7em;
+    }
+    /* suppress hover lift on mobile */
+    .bet-square:hover,
+    .bet-square:focus {
+        transform: none;
+        box-shadow: 0 0 5px rgba(255, 215, 0, 0.4);
+    }
+
+    /* ---- CONTROLS: chips + action buttons in one row ---- */
+    .betting-controls {
+        flex: 0 0 auto;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        gap: 4px;
+        margin-bottom: 0;
+    }
+    .chip-selector { gap: 4px; }
+    .chip {
+        width: 36px;
+        height: 36px;
+        font-size: 0.7em;
+        border-width: 2px;
+    }
+    .game-controls { gap: 4px; flex-wrap: nowrap; }
+    .game-controls button {
+        padding: 5px 8px;
+        font-size: 0.68em;
+        border-radius: 6px;
+        min-width: auto;
+    }
+    /* hide repeated text, show compact labels */
+    #clear-bets::after, #repeat-bet::after, #bet-max::after, #roll-dice::after { display: none; }
+    .quick-bets { display: none; }
+
+    /* ---- DICE: compact inline ---- */
+    .dice-container {
+        flex: 0 0 auto;
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        margin-bottom: 0;
+    }
+    .dice {
+        width: 44px;
+        height: 44px;
+        font-size: 1.8em;
+        border-radius: 8px;
+    }
+
+    /* ---- RESULT: inline with dice ---- */
+    .result-message {
+        flex: 0 0 auto;
+        font-size: 0.75em;
+        min-height: 16px;
+        margin-top: 0;
+        padding: 0;
+    }
+
+    /* ---- HISTORY: 2 items max ---- */
+    .history-container {
+        flex: 1 1 auto;
+        min-height: 0;
+        margin-top: 0;
+        padding: 4px 8px;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    .history-container h4 {
+        font-size: 0.65em;
+        margin-bottom: 2px;
+    }
+    .history-list {
+        max-height: 100%;
+        overflow-y: auto;
+        gap: 2px;
+    }
+    .history-item {
+        padding: 2px 8px;
+        font-size: 0.65em;
+        border-radius: 4px;
+    }
+    .history-dice { font-size: 0.9em; letter-spacing: 3px; }
+    .history-result { font-size: 0.9em; }
+    .history-time { display: none; }
+    .history-placeholder { font-size: 0.65em; padding: 4px; }
+
+    /* ---- Hide inline secondary sections, keep as modals ---- */
     .multiplayer-section,
-    .tournament-section { grid-column: auto; }
+    .tournament-section {
+        display: none !important; /* shown via JS, becomes overlay */
+    }
+
+    /* ---- Compact panel overlays for mobile ---- */
+    .stats-panel, .limits-panel, .profile-panel,
+    .help-panel, .achievements-panel, .instructions-panel {
+        width: 95%;
+        max-width: 95%;
+        max-height: 85vh;
+        padding: 12px;
+        border-radius: 10px;
+        border-width: 2px;
+    }
+    .stats-panel h3, .limits-panel h3, .profile-panel h3,
+    .help-panel h3, .achievements-panel h3, .instructions-panel h3 {
+        font-size: 1.1em;
+    }
+    .close-btn { font-size: 1.5em; width: 24px; height: 24px; }
+
+    /* ---- Disable tooltips on mobile ---- */
+    button[title]:hover::after,
+    button[title]:hover::before,
+    .bet-square[title]:hover::after,
+    .bet-square[title]:hover::before,
+    .dice[title]:hover::after,
+    .dice[title]:hover::before {
+        display: none;
+    }
 }
