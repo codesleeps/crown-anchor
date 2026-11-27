@@ -298,40 +298,9 @@ button[title]:hover::before,
     transform: translateX(-50%) translateY(1px);
 }
 
-/* Mobile responsive design */
-@media (max-width: 768px) {
-    .logo-text {
-        display: none;
-    }
-
-    .logo-icon {
-        font-size: 2em;
-    }
-
-    .control-buttons {
-        gap: 5px;
-    }
-
-    .control-btn {
-        width: 30px;
-        height: 30px;
-        font-size: 1em;
-    }
-
-    .balance {
-        gap: 10px;
-        font-size: 1em;
-    }
-
-    /* Hide custom tooltips on mobile, use native ones */
-    button[title]:hover::after,
-    button[title]:hover::before,
-    .bet-square[title]:hover::after,
-    .bet-square[title]:hover::before,
-    .dice[title]:hover::after,
-    .dice[title]:hover::before {
-        display: none;
-    }
+/* Mode pills hidden on desktop (> 900px) */
+.mode-pills {
+    display: none;
 }
 
 .game-mode-selector {
@@ -566,220 +535,6 @@ button[title]:hover::before,
 
 .result-message.lose {
     color: #f44336;
-}
-
-@media (max-width: 768px) {
-    body {
-        padding: 10px;
-        align-items: flex-start;
-        min-height: auto;
-    }
-
-    .game-container {
-        padding: 15px;
-        margin: 0;
-        max-width: 100%;
-        width: 100%;
-        min-width: 0;
-        overflow-x: hidden;
-    }
-
-    .header-section {
-        flex-direction: column;
-        gap: 10px;
-        text-align: center;
-    }
-
-    .logo-text {
-        font-size: 1.8em;
-    }
-
-    .logo-icon {
-        font-size: 2em;
-    }
-
-    .balance {
-        flex-direction: column;
-        gap: 10px;
-        font-size: 1em;
-        padding: 10px;
-    }
-
-    .control-buttons {
-        gap: 5px;
-        justify-content: center;
-        flex-wrap: wrap;
-    }
-
-    .control-btn {
-        width: 30px;
-        height: 30px;
-        font-size: 1em;
-    }
-
-    .betting-board {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 10px;
-        margin-bottom: 20px;
-    }
-
-    .bet-square {
-        padding: 15px 10px;
-    }
-
-    .symbol {
-        font-size: 2.5em;
-        margin-bottom: 8px;
-    }
-
-    .symbol-name {
-        font-size: 1em;
-        margin-bottom: 8px;
-    }
-
-    .betting-controls {
-        flex-direction: column;
-        gap: 15px;
-        margin-bottom: 20px;
-    }
-
-    .chip-selector {
-        justify-content: center;
-        flex-wrap: wrap;
-        gap: 8px;
-    }
-
-    .chip {
-        width: 50px;
-        height: 50px;
-        font-size: 0.9em;
-    }
-
-    .game-controls {
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 10px;
-    }
-
-    .game-controls button {
-        padding: 12px 18px;
-        font-size: 1em;
-        min-width: 120px;
-    }
-
-    .quick-bets {
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 8px;
-    }
-
-    .quick-bet-btn {
-        padding: 8px 12px;
-        font-size: 0.85em;
-        min-width: 100px;
-    }
-
-    .dice-container {
-        gap: 15px;
-        margin-bottom: 15px;
-    }
-
-    .dice {
-        font-size: 3em;
-        width: 60px;
-        height: 60px;
-    }
-
-    .result-message {
-        font-size: 1.1em;
-        margin-top: 15px;
-        word-wrap: break-word;
-    }
-
-    .history-container {
-        margin-top: 20px;
-        padding: 15px;
-    }
-
-    .theme-selector {
-        font-size: 0.8em;
-    }
-
-    .theme-selector select {
-        font-size: 0.75em;
-        padding: 2px 6px;
-    }
-
-    .game-mode-selector {
-        font-size: 0.8em;
-    }
-
-    .game-mode-selector select {
-        font-size: 0.8em;
-        padding: 4px 8px;
-    }
-
-    /* Hide custom tooltips on mobile, use native ones */
-    button[title]:hover::after,
-    button[title]:hover::before,
-    .bet-square[title]:hover::after,
-    .bet-square[title]:hover::before,
-    .dice[title]:hover::after,
-    .dice[title]:hover::before {
-        display: none;
-    }
-
-    /* Panel adjustments for mobile */
-    .stats-panel,
-    .limits-panel,
-    .profile-panel,
-    .help-panel,
-    .achievements-panel,
-    .instructions-panel {
-        width: 95%;
-        max-width: 95%;
-        max-height: 90vh;
-        margin: 5px;
-        padding: 15px;
-    }
-
-    .shortcuts-grid {
-        grid-template-columns: 1fr;
-        gap: 6px;
-    }
-
-    .shortcut-item {
-        font-size: 0.85em;
-    }
-
-    .achievements-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .achievement-item {
-        padding: 12px;
-        gap: 12px;
-    }
-
-    .achievement-icon {
-        font-size: 1.8em;
-        width: 40px;
-    }
-
-    .symbols-grid {
-        grid-template-columns: 1fr;
-        gap: 10px;
-    }
-
-    .symbol-info {
-        padding: 12px;
-        gap: 12px;
-    }
-
-    .symbol-large {
-        font-size: 2em;
-        width: 50px;
-    }
 }
 
 /* Control Buttons */
@@ -2418,6 +2173,7 @@ body.dark-mode .advanced-notification.error {
 .balance        { grid-area: balance; margin-bottom: 0; }
 .betting-board  { grid-area: board; margin-bottom: 0; }
 .betting-controls { grid-area: controls; margin-bottom: 0; flex-direction: column; align-items: stretch; gap: 14px; }
+.dice-result-row { display: contents; }
 .dice-container { grid-area: dice; margin-bottom: 0; }
 .result-message { grid-area: result; margin-top: 0; }
 .history-container { grid-area: history; margin-top: 0; }
@@ -2442,209 +2198,547 @@ body.dark-mode .advanced-notification.error {
 .history-list { max-height: 150px; }
 
 /* ============================================================
-   MOBILE-FIRST: Single screen, ZERO vertical scroll
-   iPhone ~375×667 usable viewport target
+   Mobile UI Rebuild Specification (<= 900px)
    ============================================================ */
 @media (max-width: 900px) {
-    /* ============================================================
-       MOBILE LAYOUT — every element visible, large touch targets 
-    ============================================================ */
-
-    html, body {
-        margin: 0; padding: 0;
-        background: #0a0e1a;
+    body {
+        font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: #0b0f1a;
+        color: #e2e8f0;
+        padding: 0;
+        margin: 0;
+        min-height: 100dvh;
+        display: block;
     }
 
     .game-container {
+        width: 100%;
+        max-width: 100%;
+        min-height: 100dvh;
+        margin: 0;
+        padding: 10px 12px;
+        border-radius: 0;
+        background: #0b0f1a;
+        box-shadow: none;
         display: flex;
         flex-direction: column;
-        max-width: 100%;
-        width: 100%;
-        padding: 8px 10px;
-        gap: 8px;
-        border-radius: 0;
-        margin: 0;
-        background: rgba(0, 0, 0, 0.85);
+        gap: 10px;
     }
 
-    /* ---- HEADER ---- */
+    /* Hide custom hover tooltips on mobile */
+    button[title]:hover::after,
+    button[title]:hover::before,
+    .bet-square[title]:hover::after,
+    .bet-square[title]:hover::before,
+    .dice[title]:hover::after,
+    .dice[title]:hover::before {
+        display: none;
+    }
+
+    /* 5.1 Top Bar */
     .header-section {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 6px;
-        padding: 2px 0;
-    }
-    .game-logo { gap: 6px; }
-    .logo-icon { font-size: 1.5em; }
-    .logo-text { font-size: 1.2em; }
-    .game-mode-selector { font-size: 0.8em; }
-    .game-mode-selector select { font-size: 0.8em; padding: 3px 6px; }
-
-    /* ---- BALANCE BAR ---- */
-    .balance {
         display: flex;
         flex-direction: row;
         justify-content: space-between;
         align-items: center;
-        flex-wrap: wrap;
-        gap: 4px;
-        font-size: 0.9em;
-        padding: 6px 10px;
-        border-radius: 8px;
-    }
-    .balance > span:first-child { font-size: 1em; font-weight: bold; }
-    .streak-display, .bonus-display { font-size: 0.75em; padding: 2px 8px; }
-    .theme-selector { display: none; }
-    .control-buttons { gap: 6px; }
-    .control-btn {
-        width: 30px; height: 30px;
-        font-size: 0.9em;
-        border-width: 1.5px;
+        flex-wrap: nowrap;
+        gap: 8px;
+        margin: 0;
+        min-height: 40px;
     }
 
-    /* ---- BETTING BOARD: 3×2 large squares ---- */
+    .game-logo {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        min-width: 0;
+        flex: 1;
+    }
+
+    .logo-icon {
+        font-size: 1.3em;
+        flex-shrink: 0;
+    }
+
+    .logo-text {
+        display: block;
+        font-size: 1.15em;
+        font-weight: 700;
+        color: #f0b90b;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin: 0;
+        text-shadow: none;
+    }
+
+    .control-buttons {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-shrink: 0;
+    }
+
+    .control-btn {
+        display: none;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: #111827;
+        border: 1.5px solid rgba(240, 185, 11, 0.4);
+        color: #e2e8f0;
+        font-size: 1em;
+        position: relative;
+        padding: 0;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Expand touch target to 48x48 without inflating visual 36x36 circle */
+    .control-btn::after {
+        content: '';
+        position: absolute;
+        inset: -6px;
+    }
+
+    #sound-toggle,
+    #stats-toggle {
+        display: inline-flex;
+    }
+
+    /* 5.2 Balance + Status */
+    .balance {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 8px;
+        margin: 0;
+        padding: 0;
+        background: transparent;
+        border: none;
+        font-size: 1em;
+    }
+
+    .balance > span:first-child {
+        color: #00c853;
+        background: linear-gradient(135deg, rgba(0, 200, 83, 0.18), rgba(0, 168, 68, 0.08));
+        border: 1.5px solid #00c853;
+        border-radius: 10px;
+        padding: 6px 14px;
+        font-weight: 700;
+        font-size: 1.05em;
+        line-height: 1.2;
+    }
+
+    .streak-display,
+    .bonus-display {
+        background: #111827;
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        color: #94a3b8;
+        font-size: 0.75em;
+        border-radius: 8px;
+        padding: 5px 8px;
+        margin: 0;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .theme-selector {
+        display: none;
+    }
+
+    /* 5.3 Mode Switch */
+    .game-mode-selector {
+        width: 100%;
+        margin: 0;
+    }
+
+    .game-mode-selector label,
+    #game-mode {
+        display: none;
+    }
+
+    .mode-pills {
+        display: flex;
+        width: 100%;
+        background: #111827;
+        border-radius: 10px;
+        padding: 3px;
+        gap: 3px;
+    }
+
+    .mode-pill {
+        flex: 1;
+        min-height: 40px;
+        border: none;
+        border-radius: 8px;
+        background: transparent;
+        color: #94a3b8;
+        font-size: 0.8em;
+        font-weight: 600;
+        cursor: pointer;
+        padding: 6px 4px;
+    }
+
+    .mode-pill.active {
+        background: #f0b90b;
+        color: #0b0f1a;
+        font-weight: 700;
+    }
+
+    /* 5.4 Betting Board (hero) */
     .betting-board {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
         gap: 8px;
+        margin: 0;
     }
+
     .bet-square {
-        padding: 12px 6px;
-        border-radius: 10px;
-        border-width: 2.5px;
-        text-align: center;
+        min-height: 78px;
+        padding: 10px 6px;
+        border-radius: 14px;
+        background: #111827;
+        border: 2px solid rgba(240, 185, 11, 0.4);
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        min-height: 72px;
-    }
-    .bet-square .symbol {
-        font-size: 2.2em;
-        margin-bottom: 2px;
-        line-height: 1.1;
-    }
-    .bet-square .symbol-name {
-        font-size: 0.8em;
-        margin-bottom: 2px;
-        line-height: 1.2;
-    }
-    .bet-square .bet-amount {
-        font-size: 0.85em;
-        font-weight: bold;
-        line-height: 1.2;
-    }
-    .bet-square:hover, .bet-square:focus {
-        transform: none;
-        box-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
+        gap: 2px;
+        transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
     }
 
-    /* ---- CHIP SELECTOR ---- */
+    .bet-square:hover {
+        transform: none;
+        box-shadow: none;
+        border-color: rgba(240, 185, 11, 0.4);
+    }
+
+    .bet-square.selected {
+        border-color: #f0b90b;
+        box-shadow: 0 0 14px rgba(240, 185, 11, 0.35);
+        background: rgba(240, 185, 11, 0.1);
+    }
+
+    .bet-square .symbol {
+        font-size: 2.2em;
+        line-height: 1.1;
+        margin: 0;
+    }
+
+    .bet-square .symbol-name {
+        font-size: 0.75em;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: #94a3b8;
+        margin: 0;
+        font-weight: 600;
+    }
+
+    .bet-square .bet-amount {
+        font-size: 0.85em;
+        color: #f0b90b;
+        font-weight: 700;
+        margin: 0;
+    }
+
+    /* 5.5 Chip Selector */
     .betting-controls {
         display: flex;
         flex-direction: column;
-        gap: 8px;
+        align-items: stretch;
+        gap: 10px;
+        margin: 0;
     }
+
     .chip-selector {
         display: flex;
-        flex-direction: row;
         justify-content: center;
-        gap: 10px;
-    }
-    .chip {
-        width: 46px;
-        height: 46px;
-        font-size: 0.9em;
-        font-weight: bold;
-        border-width: 2.5px;
-        border-radius: 50%;
+        align-items: center;
+        gap: 12px;
     }
 
-    /* ---- ACTION BUTTONS ---- */
+    .chip {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        font-weight: 700;
+        font-size: 0.85em;
+        border: 2.5px solid currentColor;
+        background: #111827;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .chip[data-value="1"] {
+        color: #fbbf24;
+    }
+
+    .chip[data-value="5"] {
+        color: #f472b6;
+    }
+
+    .chip[data-value="10"] {
+        color: #fb923c;
+    }
+
+    .chip[data-value="25"] {
+        color: #ef4444;
+    }
+
+    .chip:hover {
+        transform: none;
+        box-shadow: none;
+    }
+
+    .chip.selected {
+        transform: scale(1.12);
+        box-shadow: 0 0 12px currentColor;
+        background: #1e293b;
+        color: inherit;
+    }
+
+    .chip[data-value="1"].selected { color: #fbbf24; }
+    .chip[data-value="5"].selected { color: #f472b6; }
+    .chip[data-value="10"].selected { color: #fb923c; }
+    .chip[data-value="25"].selected { color: #ef4444; }
+
+    .chip:active {
+        transform: scale(0.92);
+    }
+
+    /* 5.6 Action Row */
     .game-controls {
         display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
+        width: 100%;
         gap: 8px;
+        align-items: stretch;
     }
-    .game-controls button {
-        padding: 10px 14px;
-        font-size: 0.8em;
-        border-radius: 8px;
-        font-weight: bold;
-    }
-    #roll-dice {
-        flex: 1 1 60%;
-        min-width: 140px;
-        font-size: 0.95em;
-        padding: 12px;
-        background: linear-gradient(45deg, #2ecc71, #27ae60) !important;
-    }
-    .quick-bets { display: none; }
 
-    /* ---- DICE ---- */
+    #bet-max,
+    .quick-bets {
+        display: none;
+    }
+
+    .game-controls button {
+        min-height: 48px;
+        border-radius: 10px;
+        margin: 0;
+    }
+
+    .game-controls button:hover {
+        transform: none;
+    }
+
+    #clear-bets {
+        flex: 1;
+        padding: 10px 8px;
+        background: rgba(239, 68, 68, 0.15) !important;
+        color: #ef4444;
+        border: 1px solid rgba(239, 68, 68, 0.35);
+        font-size: 0.85em;
+        font-weight: 700;
+    }
+
+    #repeat-bet {
+        flex: 1;
+        padding: 10px 8px;
+        background: rgba(240, 185, 11, 0.1);
+        color: #f0b90b;
+        border: 1px solid rgba(240, 185, 11, 0.35);
+        font-size: 0.85em;
+        font-weight: 700;
+    }
+
+    #roll-dice {
+        flex: 3;
+        padding: 14px 12px;
+        background: linear-gradient(135deg, #00c853, #00a844);
+        color: #000000;
+        font-weight: 800;
+        font-size: 1em;
+        border: none;
+        box-shadow: 0 4px 16px rgba(0, 200, 83, 0.3);
+    }
+
+    /* 5.7 Dice + Result */
+    .dice-result-row {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        min-height: 52px;
+    }
+
     .dice-container {
         display: flex;
         justify-content: center;
-        gap: 12px;
-    }
-    .dice {
-        width: 56px;
-        height: 56px;
-        font-size: 2.2em;
-        border-radius: 10px;
+        gap: 8px;
+        margin: 0;
     }
 
-    /* ---- RESULT ---- */
+    .dice {
+        width: 52px;
+        height: 52px;
+        background: #f8fafc;
+        color: #0b0f1a;
+        border-radius: 10px;
+        font-size: 1.8em;
+        font-weight: 800;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+    }
+
+    .dice.rolling {
+        animation: mobileShake 0.3s ease-in-out infinite;
+        background: #fef08a;
+    }
+
     .result-message {
+        margin: 0;
+        min-height: 0;
         font-size: 0.85em;
-        min-height: 20px;
-        text-align: center;
+        font-weight: 600;
+        padding: 6px 12px;
+        border-radius: 8px;
+    }
+
+    .result-message:empty {
+        display: none;
+    }
+
+    .result-message.win {
+        background: rgba(0, 200, 83, 0.15);
+        color: #00c853;
+        border: 1px solid rgba(0, 200, 83, 0.35);
+    }
+
+    .result-message.lose {
+        background: rgba(239, 68, 68, 0.15);
+        color: #ef4444;
+        border: 1px solid rgba(239, 68, 68, 0.35);
+    }
+
+    /* 5.8 History Strip */
+    .history-container {
+        margin: 0;
+        padding: 0;
+        background: transparent;
+        border: none;
+        max-height: 32px;
+        overflow: hidden;
+    }
+
+    .history-container h4 {
+        display: none;
+    }
+
+    .history-list {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        gap: 6px;
+        overflow-x: auto;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
         padding: 2px 0;
     }
 
-    /* ---- HISTORY: 3 items max ---- */
-    .history-container {
-        padding: 6px 10px;
-        border-radius: 8px;
+    .history-list::-webkit-scrollbar {
+        display: none;
     }
-    .history-container h4 {
-        font-size: 0.75em;
-        margin-bottom: 4px;
-    }
-    .history-list {
-        max-height: 72px;
-        overflow-y: auto;
-        gap: 3px;
-    }
-    .history-item {
-        padding: 3px 8px;
-        font-size: 0.72em;
-        border-radius: 4px;
-    }
-    .history-time { display: none; }
-    .history-placeholder { font-size: 0.7em; padding: 6px; }
 
-    /* ---- Modals ---- */
-    .multiplayer-section, .tournament-section {
-        display: none !important;
+    .history-item,
+    .history-placeholder {
+        flex: 0 0 auto;
+        font-size: 0.65em;
+        padding: 4px 10px;
+        border-radius: 6px;
+        background: #111827;
+        color: #94a3b8;
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        white-space: nowrap;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin: 0;
     }
-    .stats-panel, .limits-panel, .profile-panel,
-    .help-panel, .achievements-panel, .instructions-panel {
+
+    /* 5.9 Modals */
+    .stats-panel,
+    .limits-panel,
+    .profile-panel,
+    .help-panel,
+    .achievements-panel,
+    .instructions-panel {
         width: 95%;
         max-width: 95%;
         max-height: 85vh;
-        padding: 14px;
-        border-radius: 12px;
+        border-radius: 14px;
+        border: 2px solid #f0b90b;
+        background: #111827;
+        overflow-y: auto;
+        padding: 16px;
     }
-    .close-btn { font-size: 1.6em; width: 28px; height: 28px; }
 
-    /* ---- Disable tooltips ---- */
-    button[title]:hover::after, button[title]:hover::before,
-    .bet-square[title]:hover::after, .bet-square[title]:hover::before,
-    .dice[title]:hover::after, .dice[title]:hover::before {
+    .close-btn {
+        width: 28px;
+        height: 28px;
+        font-size: 1.6em;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+}
+
+@keyframes mobileShake {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-8deg); }
+    75% { transform: rotate(8deg); }
+}
+
+/* Small phones (<= 380px) */
+@media (max-width: 380px) {
+    .betting-board {
+        gap: 6px;
+    }
+
+    .chip {
+        width: 44px;
+        height: 44px;
+    }
+
+    .history-container {
         display: none;
+    }
+}
+
+/* Short viewports (< 700px height) */
+@media (max-width: 900px) and (max-height: 700px) {
+    .game-container {
+        gap: 6px;
+        padding: 8px 12px;
+    }
+
+    .history-container {
+        display: none;
+    }
+
+    .bet-square {
+        min-height: 68px;
+        padding: 8px 4px;
+    }
+
+    .dice {
+        width: 46px;
+        height: 46px;
+        font-size: 1.5em;
     }
 }
 
