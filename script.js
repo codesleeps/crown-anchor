@@ -6,6 +6,7 @@ class CrownAndAnchorGame {
         this.profileName = '';
         this.multiplayerData = { roomCode: '', players: [], isHost: false, playerName: '' };
         this.activeTournamentMatch = null;
+        this.tournamentEntryPaid = false;
 
         // Performance monitoring
         this.performanceMetrics = {
@@ -205,7 +206,7 @@ class CrownAndAnchorGame {
         const mpReadyBtn = document.getElementById('mp-ready-btn');
         if (mpReadyBtn) {
             mpReadyBtn.addEventListener('click', () => {
-                if (this.socket) this.socket.emit('mp_toggle_ready');
+                if (this.socket) this.socket.send(JSON.stringify({ event: 'mp_toggle_ready' }));
             });
         }
 
@@ -317,7 +318,7 @@ class CrownAndAnchorGame {
 
         if (this.gameMode === 'multiplayer') {
             if (this.socket) {
-                this.socket.emit('mp_place_bet', { symbol, amount: this.selectedChip });
+                this.socket.send(JSON.stringify({ event: 'mp_place_bet', data: { symbol, amount: this.selectedChip } }));
                 this.bets[symbol] += this.selectedChip;
                 this.balance -= this.selectedChip;
                 this.updateBalance();
@@ -367,7 +368,7 @@ class CrownAndAnchorGame {
     clearBets() {
         if (this.gameMode === 'multiplayer') {
             if (this.socket) {
-                this.socket.emit('mp_clear_bets');
+                this.socket.send(JSON.stringify({ event: 'mp_clear_bets' }));
                 Object.keys(this.bets).forEach(symbol => {
                     this.balance += this.bets[symbol];
                     this.bets[symbol] = 0;
@@ -579,11 +580,14 @@ class CrownAndAnchorGame {
         this.checkAchievements(results, totalWinnings);
 
         if (this.isLoggedIn && this.socket) {
-            this.socket.emit('update_profile', {
-                balance: this.balance,
-                stats: this.stats,
-                achievements: this.achievements
-            });
+            this.socket.send(JSON.stringify({
+                event: 'update_profile',
+                data: {
+                    balance: this.balance,
+                    stats: this.stats,
+                    achievements: this.achievements
+                }
+            }));
         }
     }
 
@@ -849,35 +853,7 @@ class CrownAndAnchorGame {
         }
 
         const name = playerNameInput.value.trim();
-        this.socket.emit('mp_create_room', name, (response) => {
-            if (response.success) {
-                const roomCodeInput = document.getElementById('room-code');
-                if (roomCodeInput) roomCodeInput.value = response.roomCode;
-
-                this.multiplayerData = {
-                    roomCode: response.roomCode,
-                    players: response.players,
-                    isHost: true,
-                    playerName: name
-                };
-                
-                this.updatePlayersDisplay();
-                this.showMessage(`Room ${response.roomCode} created! Share this code with friends.`, '');
-
-                const codeDisplay = document.getElementById('mp-lobby-code');
-                if (codeDisplay) {
-                    codeDisplay.textContent = `Room Code: ${response.roomCode}`;
-                    codeDisplay.style.display = 'inline-block';
-                }
-
-                const readyBtn = document.getElementById('mp-ready-btn');
-                if (readyBtn) readyBtn.style.display = 'inline-block';
-                
-                this.updateMpRollButton();
-            } else {
-                this.showMessage(`Failed to create room: ${response.error}`, 'lose');
-            }
-        });
+        this.socket.send(JSON.stringify({ event: 'mp_create_room', data: name }));
     }
 
     joinMultiplayerRoom() {
@@ -897,36 +873,7 @@ class CrownAndAnchorGame {
         const name = playerNameInput.value.trim();
         const code = roomCodeInput.value.trim().toUpperCase();
 
-        this.socket.emit('mp_join_room', { roomCode: code, playerName: name }, (response) => {
-            if (response.success) {
-                this.multiplayerData = {
-                    roomCode: response.roomCode,
-                    players: response.players,
-                    isHost: response.players.find(p => p.socketId === this.socket.id)?.isHost || false,
-                    playerName: name
-                };
-
-                this.updatePlayersDisplay();
-                this.showMessage(`Joined room ${response.roomCode}!`, 'win');
-
-                const codeDisplay = document.getElementById('mp-lobby-code');
-                if (codeDisplay) {
-                    codeDisplay.textContent = `Room Code: ${response.roomCode}`;
-                    codeDisplay.style.display = 'inline-block';
-                }
-
-                const readyBtn = document.getElementById('mp-ready-btn');
-                if (readyBtn) {
-                    readyBtn.style.display = 'inline-block';
-                    readyBtn.textContent = '✅ Ready';
-                    readyBtn.style.background = '#2ecc71';
-                }
-
-                this.updateMpRollButton();
-            } else {
-                this.showMessage(`Failed to join room: ${response.error}`, 'lose');
-            }
-        });
+        this.socket.send(JSON.stringify({ event: 'mp_join_room', data: { roomCode: code, playerName: name } }));
     }
 
     updatePlayersDisplay() {
@@ -959,25 +906,13 @@ class CrownAndAnchorGame {
         }
 
         if (this.socket) {
-            this.socket.emit('join_tournament', this.profileName || 'Player', (response) => {
-                if (response.success) {
-                    this.balance -= 50;
-                    this.updateBalance();
-
-                    const joinButton = document.getElementById('join-tournament');
-                    if (joinButton) joinButton.style.display = 'none';
-
-                    this.showMessage('Joined tournament queue! Waiting for players...', 'win');
-                } else {
-                    this.showMessage(`Failed to join tournament: ${response.error}`, 'lose');
-                }
-            });
+            this.socket.send(JSON.stringify({ event: 'join_tournament', data: this.profileName || 'Player' }));
         }
     }
 
     startTournament() {
         if (this.socket) {
-            this.socket.emit('start_tournament');
+            this.socket.send(JSON.stringify({ event: 'start_tournament' }));
         }
     }
 
@@ -1261,7 +1196,18 @@ class CrownAndAnchorGame {
     }
 
     handleJoinTournamentResponse(data) {
-        // Handled in joinTournament success callback
+        if (data && data.success) {
+            if (!this.tournamentEntryPaid) {
+                this.balance -= 50;
+                this.tournamentEntryPaid = true;
+                this.updateBalance();
+            }
+            const joinButton = document.getElementById('join-tournament');
+            if (joinButton) joinButton.style.display = 'none';
+            this.showMessage('Joined tournament queue! Waiting for players...', 'win');
+        } else {
+            this.showMessage(`Failed to join tournament: ${data?.error || 'unknown error'}`, 'lose');
+        }
     }
 
     handleTournamentQueueUpdate(data) {
@@ -1428,6 +1374,7 @@ class CrownAndAnchorGame {
         }
 
         this.tournamentData.isActive = false;
+        this.tournamentEntryPaid = false;
         const arena = document.getElementById('tournament-match-arena');
         if (arena) arena.style.display = 'none';
 
