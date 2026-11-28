@@ -2110,8 +2110,12 @@ class CrownAndAnchorGame {
         connectionStatus.className = 'connection-status online';
         connectionStatus.textContent = '🌐 Online';
         
-        // Safely append to body
-        if (document.body) {
+        // Insert into the header flow (before the control buttons) so it can
+        // never float on top of them; fall back to body if the header is missing
+        const headerEl = document.querySelector('.header-section');
+        if (headerEl) {
+            headerEl.insertBefore(connectionStatus, headerEl.querySelector('.control-buttons'));
+        } else if (document.body) {
             document.body.appendChild(connectionStatus);
         }
 

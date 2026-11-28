@@ -55,8 +55,14 @@ const MIME_TYPES = {
 };
 
 const server = http.createServer((req, res) => {
-    let urlPath = req.url === '/' ? 'index.html' : req.url.split('?')[0];
+    let urlPath = decodeURIComponent(req.url.split('?')[0]);
+    if (urlPath === '/' || urlPath === '') urlPath = '/index.html';
     let filePath = path.join(__dirname, urlPath);
+    if (!filePath.startsWith(__dirname)) {
+        res.writeHead(404, { 'Content-Type': 'text/plain' });
+        res.end('File Not Found');
+        return;
+    }
     const ext = path.extname(filePath);
     const contentType = MIME_TYPES[ext] || 'application/octet-stream';
 
