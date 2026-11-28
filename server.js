@@ -1046,6 +1046,6 @@ function advanceTournamentRound() {
     simulateBotMatches();
 }
 
-server.listen(PORT, '0.0.0.0', () => {
+server.listen(PORT, '127.0.0.1', () => {
     console.log(`Crown & Anchor zero-dependency server running at http://0.0.0.0:${PORT}`);
 });
